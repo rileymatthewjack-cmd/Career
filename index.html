@@ -110,6 +110,7 @@
   .tl-milestone{position:absolute;top:1px;width:10px;height:10px;background:var(--rose);border-radius:2px;transform:translateX(-50%) rotate(45deg);}
   .tl-today{position:absolute;top:-6px;bottom:-6px;width:0;border-left:2px dashed var(--rose);z-index:2;}
   .tl-today-label{position:absolute;top:-18px;font-family:var(--mono);font-size:10px;color:var(--rose);transform:translateX(-50%);font-weight:600;}
+  .tl-grid-line{position:absolute;top:0;bottom:0;width:0;border-left:1px solid rgba(23,38,61,0.07);pointer-events:none;z-index:0;}
   .tl-legend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-soft);}
   .tl-legend span{display:inline-flex;align-items:center;gap:6px;}
   .tl-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;}
@@ -260,16 +261,32 @@
   .cal-day.today{border-color:var(--rhythm);border-width:2px;font-weight:700;}
   .cal-day.milestone{background:#FBF0F1;border-color:#E6BEC2;}
   .cal-day.has-note::after{content:"";position:absolute;bottom:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+  .cal-day.has-external{border-color:#B8D4E3;}
+  .cal-ext-dot{position:absolute;bottom:4px;left:4px;width:5px;height:5px;border-radius:50%;background:#1E88A8;display:block;}
   .cal-day .cal-num{font-family:var(--mono);}
   .cal-day .cal-tag{display:block;font-size:8.5px;color:var(--rose);line-height:1.1;margin-top:2px;}
   .countdown-box{background:var(--navy-deep);color:#fff;border-radius:10px;padding:16px 20px;margin-bottom:18px;text-align:center;}
   .countdown-box .cd-num{font-family:var(--mono);font-size:34px;color:var(--rhythm);font-weight:700;}
   .countdown-box .cd-label{font-size:12.5px;color:#B9C3D2;margin-top:2px;}
 
+  /* ---------- Habit streak tracker ---------- */
+  .habit-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:8px 0 14px;}
+  .habit-streak-num{font-family:var(--mono);font-size:38px;font-weight:700;color:var(--rhythm);line-height:1;}
+  .habit-streak-num.at-risk{color:var(--gold);}
+  .habit-streak-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-soft);margin-top:2px;}
+  #habitToggleBtn.done{background:var(--rhythm);}
+  #habitToggleBtn.done::before{content:"✓ ";}
+  .habit-grid{display:flex;gap:4px;flex-wrap:wrap;}
+  .habit-day{width:16px;height:16px;border-radius:4px;border:1px solid var(--line);background:#fff;cursor:pointer;flex-shrink:0;}
+  .habit-day.done{background:var(--rhythm);border-color:var(--rhythm);}
+  .habit-day.today{box-shadow:0 0 0 2px var(--rose) inset;}
+
   /* ---------- Wall display mode ---------- */
   #wallModeBtn{background:transparent;border:1px solid #3A4E6B;color:#B9C3D2;border-radius:7px;padding:6px 12px;font-size:11.5px;font-family:var(--mono);cursor:pointer;}
   #wallModeBtn:hover{background:#233450;}
-  body.wall-mode header.top .top-stats, body.wall-mode nav.tabs button:not(.active){display:none;}
+  body.wall-mode header.top .top-stats{display:none;}
+  body.wall-mode nav.tabs button{display:none;}
+  body.wall-mode nav.tabs button[data-tab="progress"], body.wall-mode nav.tabs button[data-tab="home"]{display:inline-block;}
   body.wall-mode main{max-width:100%;padding:36px 48px;}
   body.wall-mode .section-title{font-size:34px;}
   body.wall-mode .section-sub{font-size:16px;}
@@ -288,9 +305,50 @@
   body.wall-mode .tl-legend{font-size:14px;}
   body.wall-mode .eyebrow{font-size:12.5px;}
   body.wall-mode .card h3{font-size:20px;}
+
+  /* ---------- Home tab: week planner + house items ---------- */
+  .week-planner-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:12px;}
+  @media (max-width:820px){.week-planner-grid{grid-template-columns:repeat(2,1fr);}}
+  .week-day{background:var(--paper-alt);border:1px solid var(--line);border-radius:8px;padding:8px;display:flex;flex-direction:column;}
+  .week-day h5{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--rhythm);margin:0 0 6px;text-align:center;}
+  .week-day textarea{flex:1;min-height:90px;font-size:12px;border:none;background:transparent;resize:none;padding:0;}
+  .week-day textarea:focus{outline:1px solid var(--rhythm-dim);border-radius:4px;}
+  .house-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13.5px;}
+  .house-item:last-child{border-bottom:none;}
+  .house-item input[type=checkbox]{width:17px;height:17px;accent-color:var(--rhythm);cursor:pointer;flex-shrink:0;}
+  .house-item .hi-text{flex:1;color:var(--ink);}
+  .house-item.done .hi-text{text-decoration:line-through;color:#A6AEB8;}
+  .house-item button{background:transparent;border:none;color:var(--ink-soft);cursor:pointer;font-size:14px;padding:2px 6px;}
+  body.wall-mode .week-day h5{font-size:14px;}
+  body.wall-mode .week-day textarea{font-size:16px;min-height:130px;}
+  body.wall-mode .house-item{font-size:19px;padding:12px 0;}
+  body.wall-mode .house-item input[type=checkbox]{width:24px;height:24px;}
   body.wall-mode nav.tabs{padding:0 48px;}
   #exitWallBtn{display:none;position:fixed;top:14px;right:14px;z-index:999;background:var(--navy-deep);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;opacity:.55;}
   body.wall-mode #exitWallBtn{display:block;}
+
+  /* ---------- v3 operational dashboard & resilience ---------- */
+  .header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .header-actions button,.header-actions label{background:transparent;border:1px solid #3A4E6B;color:#B9C3D2;border-radius:7px;padding:6px 10px;font-size:11px;font-family:var(--mono);cursor:pointer;}
+  .header-actions button:hover,.header-actions label:hover{background:#233450;color:#fff;}
+  .storage-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--gold);}
+  .storage-dot.ok{background:var(--rhythm);}.storage-dot.warn{background:var(--gold);}.storage-dot.bad{background:var(--rose);}
+  .today-grid{display:grid;grid-template-columns:1.35fr .85fr;gap:16px;align-items:start;}
+  @media(max-width:880px){.today-grid{grid-template-columns:1fr;}}
+  .priority-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:11px 0;border-bottom:1px dashed var(--line);}
+  .priority-row:last-child{border-bottom:none;}
+  .priority-rank{font-family:var(--mono);font-size:11px;color:var(--rhythm);font-weight:700;padding-top:3px;}
+  .priority-title{font-weight:600;color:var(--ink);font-size:13.5px;}
+  .priority-action{font-size:12px;color:var(--ink-soft);margin-top:3px;line-height:1.45;}
+  .status-chip{font-family:var(--mono);font-size:10px;border-radius:12px;padding:3px 8px;background:var(--paper-alt);color:var(--ink-soft);white-space:nowrap;}
+  .quick-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .quick-form .wide{grid-column:1/-1;}
+  .due-item{padding:9px 0;border-bottom:1px dashed var(--line);font-size:12.5px;}
+  .due-item:last-child{border-bottom:none;}
+  .due-date{font-family:var(--mono);font-size:10.5px;color:var(--rose);}
+  .system-banner{font-size:11px;color:#B9C3D2;font-family:var(--mono);display:flex;align-items:center;}
+  .assumption-note{background:#FBF4E4;border:1px solid #E7D3A6;border-radius:8px;padding:10px 12px;font-size:11.5px;color:var(--ink-soft);margin-bottom:16px;}
+
 </style>
 </head>
 <body>
@@ -302,7 +360,12 @@
       <p>v2 · one thesis, disciplined by systems, not eight parallel identities</p>
     </div>
     <div class="top-stats" id="topStats"></div>
-    <button id="wallModeBtn">⛶ Wall Display Mode</button>
+    <div class="header-actions">
+      <span class="system-banner" id="storageStatus"><span class="storage-dot warn"></span>checking storage</span>
+      <button id="exportBtn" type="button">Export backup</button>
+      <label for="importFile">Import backup</label><input id="importFile" type="file" accept="application/json" hidden>
+      <button id="wallModeBtn" type="button">⛶ Wall mode</button>
+    </div>
   </div>
   <div class="rhythm-strip">
     <svg viewBox="0 0 1000 34" preserveAspectRatio="none">
@@ -315,8 +378,10 @@
 <button id="exitWallBtn">✕ Exit wall mode</button>
 
 <nav class="tabs" id="tabNav">
-  <button data-tab="overview" class="active">Overview</button>
+  <button data-tab="today" class="active">This Week</button>
+  <button data-tab="overview">Strategy</button>
   <button data-tab="progress">Progress</button>
+  <button data-tab="home">Home</button>
   <button data-tab="planner">Planner</button>
   <button data-tab="longterm">Long-Term Strategy</button>
   <button data-tab="shortterm">Short-Term (Now)</button>
@@ -326,8 +391,51 @@
 
 <main>
 
+  <!-- ================= THIS WEEK ================= -->
+  <section class="panel active" id="panel-today">
+    <h2 class="section-title">This week</h2>
+    <p class="section-sub">Open here first. Three priorities, the next physical action for each, and only the deadlines that are close enough to matter.</p>
+    <div class="today-grid">
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <span class="eyebrow">Current quarter</span>
+          <h3 id="quarterTheme">Finish and establish</h3>
+          <p id="quarterOutcome">Submit the MSc dissertation, start IMT sustainably, formalise the UHL AI role and register the scoping-review protocol.</p>
+        </div>
+        <div class="card">
+          <span class="eyebrow">Top three priorities</span>
+          <div id="weeklyPriorities"></div>
+          <details style="margin-top:14px;">
+            <summary style="cursor:pointer;font-size:12px;color:var(--ink-soft);">Edit priorities</summary>
+            <div class="quick-form" style="margin-top:12px;" id="priorityEditor"></div>
+            <button class="btn" id="savePriorities" type="button" style="margin-top:10px;">Save priorities</button>
+            <span class="save-flash" id="priorityFlash">saved</span>
+          </details>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <span class="eyebrow">Capacity</span>
+          <div class="capacity-track" style="margin:10px 0 8px;">
+            <div class="capacity-fill" id="todayCapacityFill" style="width:0%;"></div>
+            <div class="capacity-label" id="todayCapacityLabel">0 / 10 hrs</div>
+          </div>
+          <p id="capacityAdvice">Add weekly work in the Progress tab.</p>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <span class="eyebrow">Next milestones</span>
+          <div id="nextMilestones"></div>
+        </div>
+        <div class="card">
+          <span class="eyebrow">Deliberate exclusion</span>
+          <p id="todayNotNow">No third major research project until the dissertation and scoping-review protocol are submitted.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ================= OVERVIEW ================= -->
-  <section class="panel active" id="panel-overview">
+  <section class="panel" id="panel-overview">
     <h2 class="section-title">The thesis, and where things stand</h2>
     <p class="section-sub">Everything else in this panel is a working-out of the paragraph below. v2 exists because v1 had four parallel pillars and no single axle — this is the axle.</p>
 
@@ -393,10 +501,22 @@
       </div>
       <div id="taskRows"></div>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <select id="taskPreset" style="flex:1;min-width:180px;font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;">
+          <option value="">— Select a predefined task —</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
         <input type="text" id="taskName" placeholder="Task (e.g. MRCP Part 2 prep)" style="flex:2;min-width:160px;">
         <input type="number" id="taskHours" placeholder="hrs/wk" style="flex:0 0 90px;" min="0" step="0.5">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center;">
+        <label class="field-label" style="margin:0;flex:0 0 auto;">Target start</label>
+        <input type="date" id="taskStart" style="flex:1;min-width:140px;">
+        <label class="field-label" style="margin:0;flex:0 0 auto;">Target end</label>
+        <input type="date" id="taskEnd" style="flex:1;min-width:140px;">
         <button class="btn secondary" id="taskAdd" style="padding:8px 14px;">Add task</button>
       </div>
+      <p style="margin-top:8px;font-size:11px;color:var(--ink-soft);">Tasks with a start and end date automatically appear on the near-term Gantt chart below — only IMT1–3 are fixed constants, everything else on the chart is whatever you've added here.</p>
       <p style="margin-top:10px;font-size:11.5px;color:var(--ink-soft);">Capacity is your discretionary time budget once clinical and family floors are subtracted (~8–11 hrs/week, per the Time Budget system) — adjust the number below if your real figure differs.</p>
       <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
         <label class="field-label" style="margin:0;">Capacity (hrs/week):</label>
@@ -408,10 +528,46 @@
 
     <div class="card" style="margin-top:20px;">
       <span class="eyebrow">Near-term timeline</span>
-      <h3>July 2026 – 2032</h3>
+      <h3>IMT1–3 (constants) + whatever you've added below</h3>
       <div class="timeline-wrap" style="border:none;padding:14px 0 4px;">
         <div id="tlNearWall"></div>
         <div class="tl-legend" id="tlNearWallLegend"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <span class="eyebrow">Calendar</span>
+      <div class="cal-header">
+        <button id="calPrevProgress">‹</button>
+        <h3 id="calTitleProgress"></h3>
+        <button id="calNextProgress">›</button>
+      </div>
+      <div class="cal-grid" id="calDowProgress"></div>
+      <div class="cal-grid" id="calGridProgress" style="margin-top:5px;"></div>
+    </div>
+  </section>
+
+  <!-- ================= HOME ================= -->
+  <section class="panel" id="panel-home">
+    <h2 class="section-title">Home</h2>
+    <p class="section-sub">The non-career half of the wall display — a generic week planner and a running list of things the house needs.</p>
+
+    <div class="card" style="margin-bottom:20px;">
+      <span class="eyebrow">Week planner</span>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <h3>This week, at a glance</h3>
+        <button class="btn secondary" id="weekPlannerClear" style="padding:5px 10px;font-size:11px;">Clear week</button>
+      </div>
+      <div class="week-planner-grid" id="weekPlannerGrid"></div>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Items needed for the house</span>
+      <h3>Shopping / to-buy list</h3>
+      <div id="houseItemsList"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <input type="text" id="houseItemInput" placeholder="Add something the house needs…" style="flex:1;">
+        <button class="btn secondary" id="houseItemAdd" style="padding:8px 14px;">Add</button>
       </div>
     </div>
   </section>
@@ -423,6 +579,18 @@
 
     <div class="countdown-box" id="countdownBox"></div>
 
+    <div class="card habit-card" style="margin-bottom:18px;">
+      <span class="eyebrow">Daily habit</span>
+      <div class="habit-row">
+        <div>
+          <div class="habit-streak-num" id="habitStreakNum">0</div>
+          <div class="habit-streak-label" id="habitStreakLabel">day streak</div>
+        </div>
+        <button class="btn" id="habitToggleBtn" style="align-self:center;">Meditate daily?</button>
+      </div>
+      <div class="habit-grid" id="habitGrid"></div>
+    </div>
+
     <div class="card">
       <div class="cal-header">
         <button id="calPrev">‹</button>
@@ -431,6 +599,20 @@
       </div>
       <div class="cal-grid" id="calDow"></div>
       <div class="cal-grid" id="calGrid" style="margin-top:5px;"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <span class="eyebrow">Google / Outlook calendar</span>
+      <h3>Import or sync your calendar</h3>
+      <p style="margin-bottom:10px;">True live sync would need an OAuth app registration and a hosted HTTPS URL — not possible from a standalone file. This does the practical version: import an exported .ics file (always works), or try a direct feed URL (works only if the provider allows it).</p>
+      <label class="field-label">Import .ics file (Google: Settings → Import & export. Outlook: Settings → Calendar → Shared calendars → Publish → download link)</label>
+      <input type="file" id="icsFileInput" accept=".ics,text/calendar" style="margin-bottom:12px;">
+      <label class="field-label">Or try a live feed URL (Google: Settings → Integrate calendar → Secret address in iCal format. Outlook: Publish a calendar → ICS link)</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="icsUrlInput" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" style="flex:1;">
+        <button class="btn secondary" id="icsFetchBtn" style="padding:8px 14px;">Fetch</button>
+      </div>
+      <p id="icsStatus" style="margin-top:8px;font-size:11.5px;color:var(--ink-soft);"></p>
     </div>
 
     <div class="card" id="dayNoteCard" style="margin-top:16px;display:none;">
@@ -443,6 +625,7 @@
   <section class="panel" id="panel-longterm">
     <h2 class="section-title">Long-term strategy (2026 – 2041)</h2>
     <p class="section-sub">The four pillars, the full pathway, and the ten career goals — expand any goal for why it matters, what it needs, and the risks.</p>
+    <div class="assumption-note"><b>Planning status:</b> dates beyond the current training year are working assumptions, not promises. Verify recruitment rules, ACF routes and self-assessment criteria against the live national guidance before acting.</div>
 
     <div class="timeline-wrap" style="margin-bottom:26px;">
       <div id="tlStrategic"></div>
@@ -643,7 +826,8 @@
 
 <script>
 /* ======================= DATA ======================= */
-const TODAY = new Date("2026-07-21");
+const TODAY = new Date();
+TODAY.setHours(0,0,0,0);
 
 const GOALS = [
   {t:"Clinical excellence", why:"The non-negotiable floor. No other pillar survives a clinical competence concern.", cap:"MRCP(UK) completion, sound acute medicine, LTFT-adjusted but not diluted competency sign-off.", success:"ARCP outcome 1 every year without exception; MRCP(UK) complete within IMT; zero remediation episodes.", risk:"LTFT can be wrongly read as reduced commitment; over-indexing on research at the expense of clinical logbook density.", time:"IMT1–3, Aug 2026 to ~2030."},
@@ -751,35 +935,15 @@ const SCORE_DIMS = [
   ["Enjoyment/sustainability",10],["Opportunity cost (penalty)",5]
 ];
 
-const TL_COLORS = {"Clinical training":"#17263D","Exams":"#2E5C8A","Research output":"#2F9E64","Academic pathway":"#B8862E","Cardio-coherence":"#C2622E","Study leave":"#6B4FA0"};
+const TL_COLORS = {"Clinical training":"#17263D","Task":"#1E88A8"};
 
 const TL_NEAR = [
-  ["MRCP(UK) Part 2 Written","2026-08-01","2027-02-01","Exams"],
-  ["MRCP(UK) PACES","2027-02-01","2027-09-01","Exams"],
-  ["MSc dissertation → publication","2026-07-21","2027-01-31","Research output"],
-  ["Scoping review: protocol","2026-08-01","2026-10-01","Research output"],
-  ["Scoping review: conduct & write-up","2026-10-01","2027-10-01","Research output"],
-  ["Scoping review: submission/pub.","2027-10-01","2028-04-01","Research output"],
-  ["Cardiology audit (new, during placement)","2027-09-01","2028-03-01","Cardio-coherence"],
-  ["Cardiology case report / publication","2028-01-01","2028-07-01","Cardio-coherence"],
-  ["Cardiology presentation (local/regional)","2027-11-01","2028-03-01","Cardio-coherence"],
-  ["Cardiology-themed teaching series","2027-09-01","2028-03-01","Cardio-coherence"],
-  ["ECG interpretation course","2026-11-01","2026-11-01","Study leave"],
-  ["BSE introductory echo module","2027-05-01","2027-05-01","Study leave"],
-  ["BCS annual conference","2027-06-01","2027-06-01","Study leave"],
-  ["ALS renewal","2029-03-01","2029-03-01","Study leave"],
-  ["Evidence portfolio consolidation","2026-08-01","2026-11-01","Academic pathway"],
-  ["AI Implementation Team — named role","2026-09-01","2029-12-01","Academic pathway"],
-  ["Route A/B decision: ACF (Leicester) vs. direct PhD","2026-09-01","2026-11-01","Academic pathway"],
-  ["ACF application window (Leicester, if Route A)","2026-10-01","2027-01-31","Academic pathway"],
   ["IMT1 (80% LTFT)","2026-08-01","2027-08-01","Clinical training"],
   ["IMT2 (80% LTFT)","2027-08-01","2028-08-01","Clinical training"],
   ["IMT3 (80% LTFT)","2028-08-01","2029-12-01","Clinical training"],
-  ["PhD / Doctoral Fellowship application","2028-10-01","2029-06-01","Academic pathway"],
-  ["Cardiology ST4 national application","2029-10-01","2030-03-01","Academic pathway"],
 ];
-const TL_NEAR_MILESTONE = ["ST4 entry (cardiology)","2030-08-01"];
-const TL_NEAR_RANGE = ["2026-07-01","2030-12-01"];
+const TL_NEAR_MILESTONE = null;
+const TL_NEAR_RANGE_DEFAULT = ["2026-07-01","2030-12-01"];
 
 const TL_STRAT = [
   ["IMT1–IMT3 (core training)","2026-08-01","2030-08-01","Clinical training"],
@@ -843,25 +1007,79 @@ const TIME_BUDGET = [
 /* ======================= STORAGE (with in-memory fallback) ======================= */
 const memStore = {};
 const LS_PREFIX = 'csapp_';
+const SCHEMA_VERSION = 3;
+let storageMode = 'checking';
+function esc(value){
+  return String(value ?? '').replace(/[&<>'"]/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
+}
+function setStorageStatus(mode, message){
+  storageMode = mode;
+  const el = document.getElementById('storageStatus'); if(!el) return;
+  const cls = mode==='local'?'ok':mode==='memory'?'bad':'warn';
+  el.innerHTML = `<span class="storage-dot ${cls}"></span>${esc(message)}`;
+}
 async function saveData(key, value){
-  try{ localStorage.setItem(LS_PREFIX+key, JSON.stringify(value)); return; }catch(e){}
-  try{ if(window.storage){ await window.storage.set(key, JSON.stringify(value), false); return; } }catch(e){}
+  try{
+    localStorage.setItem(LS_PREFIX+key, JSON.stringify(value));
+    localStorage.setItem(LS_PREFIX+'schema-version', String(SCHEMA_VERSION));
+    setStorageStatus('local','saved locally'); return true;
+  }catch(e){}
+  try{ if(window.storage){ await window.storage.set(key, JSON.stringify(value), false); setStorageStatus('connector','saved'); return true; } }catch(e){}
   memStore[key] = JSON.stringify(value);
+  setStorageStatus('memory','session only — export now'); return false;
 }
 async function loadData(key, fallback){
   try{
     const raw = localStorage.getItem(LS_PREFIX+key);
-    if(raw !== null) return JSON.parse(raw);
-  }catch(e){}
+    if(raw !== null){ setStorageStatus('local','saved locally'); return JSON.parse(raw); }
+    setStorageStatus('local','local storage ready');
+  }catch(e){ setStorageStatus('memory','session only — export now'); }
   try{
     if(window.storage){
       const r = await window.storage.get(key, false);
-      if(r) return JSON.parse(r.value);
+      if(r){ setStorageStatus('connector','saved'); return JSON.parse(r.value); }
     }
   }catch(e){}
   return memStore[key] ? JSON.parse(memStore[key]) : fallback;
 }
-function flash(id){ const el=document.getElementById(id); el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1400); }
+function flash(id){ const el=document.getElementById(id); if(!el) return; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1400); }
+function exportBackup(){
+  const data={schemaVersion:SCHEMA_VERSION, exportedAt:new Date().toISOString(), values:{}};
+  try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.startsWith(LS_PREFIX)) data.values[k]=localStorage.getItem(k); } }catch(e){}
+  Object.entries(memStore).forEach(([k,v])=>{ data.values[LS_PREFIX+k]=v; });
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`career-strategy-backup-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function importBackup(file){
+  const parsed=JSON.parse(await file.text());
+  if(!parsed || !parsed.values) throw new Error('Invalid backup file');
+  Object.entries(parsed.values).forEach(([k,v])=>{ if(k.startsWith(LS_PREFIX)) localStorage.setItem(k,v); });
+  location.reload();
+}
+
+
+const WEEKLY_DEFAULT = [
+  {title:"MSc dissertation", action:"Complete the next named section or supervisor revision in one focused sitting.", status:"Active"},
+  {title:"IMT start", action:"Protect induction, clinical settling-in and supervisor arrangements before adding new commitments.", status:"Starts soon"},
+  {title:"Scoping-review protocol", action:"Agree the eligibility criteria and registration route with the co-author team.", status:"Active"}
+];
+async function renderToday(){
+  const priorities=await loadData('weekly-priorities', WEEKLY_DEFAULT);
+  document.getElementById('weeklyPriorities').innerHTML=priorities.slice(0,3).map((p,i)=>`<div class="priority-row"><div class="priority-rank">0${i+1}</div><div><div class="priority-title">${esc(p.title)}</div><div class="priority-action">Next action: ${esc(p.action)}</div></div><span class="status-chip">${esc(p.status||'Active')}</span></div>`).join('');
+  document.getElementById('priorityEditor').innerHTML=priorities.slice(0,3).map((p,i)=>`<div><label class="field-label">Priority ${i+1}</label><input type="text" data-ptitle="${i}" value="${esc(p.title)}"></div><div><label class="field-label">Status</label><input type="text" data-pstatus="${i}" value="${esc(p.status||'Active')}"></div><div class="wide"><label class="field-label">Next physical action</label><textarea data-paction="${i}">${esc(p.action)}</textarea></div>`).join('');
+  await renderTodayCapacity();
+  const upcoming=MILESTONES.map(([d,l])=>({d:new Date(d+'T00:00:00'),l})).filter(m=>m.d>=TODAY).sort((a,b)=>a.d-b.d).slice(0,4);
+  document.getElementById('nextMilestones').innerHTML=upcoming.map(m=>`<div class="due-item"><div>${esc(m.l)}</div><div class="due-date">${daysBetween(TODAY,m.d)} days · ${m.d.toLocaleDateString('en-GB')}</div></div>`).join('') || '<p>No upcoming milestones.</p>';
+}
+async function renderTodayCapacity(){
+  const tasks=await loadData('workload-tasks',[]), capacity=Number(await loadData('workload-capacity',10));
+  const hours=tasks.filter(t=>!t.done).reduce((sum,t)=>sum+Number(t.hours||0),0), percent=capacity?Math.round(hours/capacity*100):0;
+  const fill=document.getElementById('todayCapacityFill'); if(!fill) return;
+  fill.style.width=Math.min(percent,100)+'%'; fill.className='capacity-fill'+(hours>capacity?' over':'');
+  document.getElementById('todayCapacityLabel').textContent=`${hours} / ${capacity} hrs/wk (${percent}%)`;
+  document.getElementById('capacityAdvice').textContent=hours>capacity?'Over capacity: remove, defer or shrink a commitment before adding anything.':percent>=80?'Nearly full: new work must replace something.':'Capacity remains, but protect clinical settling-in and family time first.';
+}
 
 /* ======================= TABS ======================= */
 document.getElementById('tabNav').addEventListener('click', e=>{
@@ -958,10 +1176,26 @@ function renderPHST(){
 }
 
 /* ======================= TIMELINE RENDERER ======================= */
-function parseDate(s){ return new Date(s); }
+function parseDate(s){ return new Date(s+'T00:00:00'); }
 function pct(d, start, end){ return (d-start)/(end-start)*100; }
 
-function renderTimeline(containerId, legendId, tasks, milestones, range){
+function gridTicks(start, end, granularity){
+  const ticks = [];
+  if(granularity === 'month'){
+    let cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+    if(cursor < start) cursor = new Date(cursor.getFullYear(), cursor.getMonth()+1, 1);
+    while(cursor <= end){
+      ticks.push(new Date(cursor));
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth()+1, 1);
+    }
+  } else if(granularity === 'year'){
+    let y = start.getFullYear()+1;
+    while(new Date(y,0,1) <= end){ ticks.push(new Date(y,0,1)); y++; }
+  }
+  return ticks;
+}
+
+function renderTimeline(containerId, legendId, tasks, milestones, range, gridGranularity){
   const start = parseDate(range[0]), end = parseDate(range[1]);
   const cont = document.getElementById(containerId);
   const milestoneList = milestones ? (Array.isArray(milestones[0]) ? milestones : [milestones]) : [];
@@ -982,9 +1216,9 @@ function renderTimeline(containerId, legendId, tasks, milestones, range){
     const sd = parseDate(s), ed = parseDate(e);
     const left = pct(sd,start,end), width = pct(ed,start,end)-pct(sd,start,end);
     html += `<div class="tl-row">
-      <div class="tl-label">${name}</div>
+      <div class="tl-label">${esc(name)}</div>
       <div class="tl-track">
-        <div class="tl-bar" style="left:${left}%;width:${Math.max(width,0.6)}%;background:${TL_COLORS[cat]};" title="${name}"></div>
+        <div class="tl-bar" style="left:${left}%;width:${Math.max(width,0.6)}%;background:${TL_COLORS[cat]};" title="${esc(name)}"></div>
       </div>
     </div>`;
   });
@@ -993,14 +1227,19 @@ function renderTimeline(containerId, legendId, tasks, milestones, range){
     const md = parseDate(milestone[1]);
     const mpct = pct(md,start,end);
     html += `<div class="tl-row" style="margin-top:4px;">
-      <div class="tl-label" style="font-weight:600;color:var(--rose);">${milestone[0]}</div>
+      <div class="tl-label" style="font-weight:600;color:var(--rose);">${esc(milestone[0])}</div>
       <div class="tl-track"><div class="tl-milestone" style="left:${mpct}%;"></div></div>
     </div>`;
   });
 
   const todayPct = pct(TODAY,start,end);
 
-  cont.innerHTML = `<div style="position:relative;">${html}
+  const gridLines = gridGranularity ? gridTicks(start,end,gridGranularity).map(d=>{
+    const p = pct(d,start,end);
+    return `<div class="tl-grid-line" style="left:calc(230px + (100% - 230px) * ${p/100});"></div>`;
+  }).join('') : '';
+
+  cont.innerHTML = `<div style="position:relative;">${gridLines}${html}
     <div class="tl-today" style="left:calc(230px + (100% - 230px) * ${todayPct/100}); position:absolute; top:0; bottom:0;">
       <div class="tl-today-label">Today</div>
     </div>
@@ -1069,7 +1308,7 @@ async function renderOppLog(){
   if(!log.length){ document.getElementById('oppLog').innerHTML=''; return; }
   document.getElementById('oppLog').innerHTML = `<span class="eyebrow">Recent log</span>` + log.map(o=>
     `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--line);">
-      <span>${o.name}</span><span style="font-family:var(--mono);color:${o.score>=350?'var(--rhythm)':o.score>=250?'var(--gold)':'var(--rose)'}">${o.score} · ${o.date}</span>
+      <span>${esc(o.name)}</span><span style="font-family:var(--mono);color:${o.score>=350?'var(--rhythm)':o.score>=250?'var(--gold)':'var(--rose)'}">${o.score} · ${o.date}</span>
     </div>`).join('');
 }
 
@@ -1109,7 +1348,7 @@ async function renderNotNow(){
   if(!items){ items = NOT_NOW_DEFAULT; await saveData('not-now-list', items); }
   document.getElementById('notNowList').innerHTML = items.map((it,i)=>`
     <div class="notnow-item">
-      <div><div class="nn-text">${it.text}</div><div class="nn-review">${it.review}</div></div>
+      <div><div class="nn-text">${esc(it.text)}</div><div class="nn-review">${esc(it.review)}</div></div>
       <button class="btn secondary" data-remove="${i}" style="padding:5px 10px;font-size:11px;">Remove</button>
     </div>
   `).join('');
@@ -1173,7 +1412,7 @@ async function renderContacts(){
     const last = c.date ? new Date(c.date) : null;
     const overdue = last ? (Math.round((now-last)/86400000) > cadenceDays[c.tier]) : true;
     return `<div class="contact-row">
-      <div><b>${c.name}</b><div style="font-size:11px;color:var(--ink-soft);">${c.note||''}</div></div>
+      <div><b>${esc(c.name)}</b><div style="font-size:11px;color:var(--ink-soft);">${esc(c.note||'')}</div></div>
       <div><span class="tier-badge ${overdue?'overdue':'t'+c.tier}">${overdue?'Overdue':'Tier '+c.tier}</span></div>
       <div style="font-family:var(--mono);font-size:11px;">${c.date||'—'}</div>
       <div></div>
@@ -1209,7 +1448,7 @@ async function renderPipeline(){
       <h5>${stage}</h5>
       ${items.filter(it=>it.stage===stage).map((it)=>{
         const idx = items.indexOf(it);
-        return `<div class="kanban-card">${it.text}
+        return `<div class="kanban-card">${esc(it.text)}
           <select data-pidx="${idx}">${PIPELINE_STAGES.map(s=>`<option value="${s}" ${s===stage?'selected':''}>${s}</option>`).join('')}</select>
         </div>`;
       }).join('')}
@@ -1237,7 +1476,7 @@ document.getElementById('pipelineAdd').addEventListener('click', async ()=>{
 async function renderJournal(){
   const entries = await loadData('decision-journal', []);
   document.getElementById('journalList').innerHTML = entries.map(e=>`
-    <div class="journal-entry"><div class="je-date">${e.date}</div><div class="je-text"><b>${e.decision}</b><br>${e.reasoning}</div></div>
+    <div class="journal-entry"><div class="je-date">${esc(e.date)}</div><div class="je-text"><b>${esc(e.decision)}</b><br>${esc(e.reasoning)}</div></div>
   `).join('');
 }
 document.getElementById('journalAdd').addEventListener('click', async ()=>{
@@ -1256,7 +1495,7 @@ document.getElementById('journalAdd').addEventListener('click', async ()=>{
 async function renderEnergy(){
   const entries = await loadData('energy-log', []);
   document.getElementById('energyList').innerHTML = entries.map(e=>`
-    <div class="journal-entry"><div class="je-date">${e.date} · thesis-aligned: ${e.thesis}</div><div class="je-text">Depleted: ${e.depleted}<br>Restored: ${e.restored}</div></div>
+    <div class="journal-entry"><div class="je-date">${esc(e.date)} · thesis-aligned: ${esc(e.thesis)}</div><div class="je-text">Depleted: ${esc(e.depleted)}<br>Restored: ${esc(e.restored)}</div></div>
   `).join('');
 }
 document.getElementById('energyAdd').addEventListener('click', async ()=>{
@@ -1290,6 +1529,69 @@ function renderTimeBudget(){
     <tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td style="font-size:12px;">${r[2]}</td></tr>
   `).join('');
 }
+
+/* ======================= HOME TAB: week planner + house items ======================= */
+const WEEK_DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+async function renderWeekPlanner(){
+  const data = await loadData('week-planner', {});
+  document.getElementById('weekPlannerGrid').innerHTML = WEEK_DAYS.map(day=>`
+    <div class="week-day">
+      <h5>${day}</h5>
+      <textarea data-weekday="${day}" placeholder="…">${esc(data[day]||'')}</textarea>
+    </div>
+  `).join('');
+  document.querySelectorAll('[data-weekday]').forEach(ta=>{
+    ta.addEventListener('blur', async ()=>{
+      const d = await loadData('week-planner', {});
+      d[ta.dataset.weekday] = ta.value;
+      await saveData('week-planner', d);
+    });
+  });
+}
+document.getElementById('weekPlannerClear').addEventListener('click', async ()=>{
+  await saveData('week-planner', {});
+  renderWeekPlanner();
+});
+
+async function renderHouseItems(){
+  const items = await loadData('house-items', []);
+  document.getElementById('houseItemsList').innerHTML = items.map((it,i)=>`
+    <div class="house-item ${it.done?'done':''}">
+      <input type="checkbox" ${it.done?'checked':''} data-houseitem-done="${i}">
+      <div class="hi-text">${esc(it.text)}</div>
+      <button data-houseitem-rm="${i}" title="Remove">✕</button>
+    </div>
+  `).join('') || `<p style="color:var(--ink-soft);font-size:12.5px;">Nothing on the list — add something below.</p>`;
+  document.querySelectorAll('[data-houseitem-done]').forEach(cb=>{
+    cb.addEventListener('change', async ()=>{
+      const items = await loadData('house-items', []);
+      items[Number(cb.dataset.houseitemDone)].done = cb.checked;
+      await saveData('house-items', items);
+      renderHouseItems();
+    });
+  });
+  document.querySelectorAll('[data-houseitem-rm]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const items = await loadData('house-items', []);
+      items.splice(Number(b.dataset.houseitemRm),1);
+      await saveData('house-items', items);
+      renderHouseItems();
+    });
+  });
+}
+document.getElementById('houseItemAdd').addEventListener('click', async ()=>{
+  const val = document.getElementById('houseItemInput').value.trim();
+  if(!val) return;
+  const items = await loadData('house-items', []);
+  items.push({text:val, done:false});
+  await saveData('house-items', items);
+  document.getElementById('houseItemInput').value='';
+  renderHouseItems();
+});
+document.getElementById('houseItemInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') document.getElementById('houseItemAdd').click();
+});
 
 /* ======================= PROGRESS TAB ======================= */
 
@@ -1369,11 +1671,12 @@ async function renderTasks(){
   fill.style.width = Math.min(pct,100)+'%';
   fill.className = 'capacity-fill' + (activeHours>capacity ? ' over' : '');
   document.getElementById('capacityLabel').textContent = `${activeHours} / ${capacity} hrs/wk (${Math.round(pct)}%)`;
+  if(document.getElementById('todayCapacityFill')) renderTodayCapacity();
 
   document.getElementById('taskRows').innerHTML = tasks.map((t,i)=>`
     <div class="task-row ${t.done?'done':''}">
       <input type="checkbox" ${t.done?'checked':''} data-taskdone="${i}">
-      <div class="task-name">${t.name}</div>
+      <div class="task-name">${esc(t.name)}${t.start && t.end ? `<div style="font-family:var(--mono);font-size:10px;color:var(--ink-soft);font-weight:400;">${t.start} → ${t.end}</div>` : ''}</div>
       <div class="task-hours">${t.hours} hrs/wk</div>
       <div class="rank-btns">
         <button data-rankup="${i}" ${i===0?'disabled':''}>↑</button>
@@ -1413,21 +1716,82 @@ async function renderTasks(){
       if(i<tasks.length-1){ [tasks[i+1],tasks[i]] = [tasks[i],tasks[i+1]]; await saveData('workload-tasks', tasks); renderTasks(); }
     });
   });
+  renderNearTimelines();
 }
+
+const PREDEFINED_TASKS = [
+  {name:"MRCP Part 2 prep", hours:5},
+  {name:"PACES prep", hours:4},
+  {name:"AI rollout project", hours:6},
+  {name:"Scoping review work", hours:4},
+  {name:"Dissertation write-up", hours:3},
+  {name:"Cardiology audit", hours:2},
+  {name:"Teaching prep", hours:2},
+  {name:"On-call recovery", hours:3},
+  {name:"Relationship capital follow-ups", hours:1},
+];
+(function populateTaskPreset(){
+  const sel = document.getElementById('taskPreset');
+  PREDEFINED_TASKS.forEach(t=>{
+    const opt = document.createElement('option');
+    opt.value = t.name; opt.dataset.hours = t.hours;
+    opt.textContent = `${t.name} (~${t.hours} hrs/wk)`;
+    sel.appendChild(opt);
+  });
+})();
+document.getElementById('taskPreset').addEventListener('change', function(){
+  if(!this.value) return;
+  const opt = this.options[this.selectedIndex];
+  document.getElementById('taskName').value = this.value;
+  document.getElementById('taskHours').value = opt.dataset.hours;
+});
+(function prefillTaskDates(){
+  const startEl = document.getElementById('taskStart'), endEl = document.getElementById('taskEnd');
+  startEl.value = ymd(TODAY);
+  endEl.value = ymd(addDays(TODAY,7));
+})();
 document.getElementById('taskAdd').addEventListener('click', async ()=>{
   const name = document.getElementById('taskName').value.trim();
   const hours = Number(document.getElementById('taskHours').value) || 0;
+  const start = document.getElementById('taskStart').value;
+  const end = document.getElementById('taskEnd').value;
   if(!name) return;
   const tasks = await loadData('workload-tasks', []);
-  tasks.push({name, hours, done:false});
+  tasks.push({name, hours, done:false, start: start||null, end: end||null});
   await saveData('workload-tasks', tasks);
   document.getElementById('taskName').value=''; document.getElementById('taskHours').value='';
+  document.getElementById('taskPreset').value='';
+  document.getElementById('taskStart').value = ymd(TODAY);
+  document.getElementById('taskEnd').value = ymd(addDays(TODAY,7));
   renderTasks();
 });
 document.getElementById('capacitySetting').addEventListener('change', async ()=>{
   await saveData('workload-capacity', Number(document.getElementById('capacitySetting').value)||10);
   renderTasks();
 });
+
+/* ---------- Build the near-term Gantt from IMT1-3 constants + user-added dated tasks ---------- */
+async function getNearTermTasksWithWorkload(){
+  const tasks = await loadData('workload-tasks', []);
+  const dated = tasks.filter(t=>!t.done && t.start && t.end);
+  const extra = dated.map(t => [t.name, t.start, t.end, "Task"]);
+  return [...TL_NEAR, ...extra];
+}
+function computeNearTermRange(tasks){
+  let maxEnd = new Date(TL_NEAR_RANGE_DEFAULT[1]+'T00:00:00');
+  tasks.forEach(([,,e])=>{
+    const d = new Date(e+'T00:00:00');
+    if(d > maxEnd) maxEnd = d;
+  });
+  const maxEndStr = ymd(new Date(maxEnd.getFullYear(), maxEnd.getMonth()+2, 1));
+  return [TL_NEAR_RANGE_DEFAULT[0], maxEndStr];
+}
+async function renderNearTimelines(){
+  const merged = await getNearTermTasksWithWorkload();
+  const range = computeNearTermRange(merged);
+  renderTimeline('tlNear','tlNearLegend', merged, TL_NEAR_MILESTONE, range, 'month');
+  renderTimeline('tlNearWall','tlNearWallLegend', merged, TL_NEAR_MILESTONE, range, 'month');
+}
 
 /* ======================= PLANNER TAB ======================= */
 
@@ -1443,26 +1807,87 @@ const MILESTONES = [
 
 let calViewDate = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
 let selectedDay = null;
+const CAL_INSTANCES = [
+  {title:'calTitle', dow:'calDow', grid:'calGrid', prev:'calPrev', next:'calNext'},
+  {title:'calTitleProgress', dow:'calDowProgress', grid:'calGridProgress', prev:'calPrevProgress', next:'calNextProgress'},
+];
 
-function ymd(d){ return d.toISOString().slice(0,10); }
+function ymd(d){ const x=new Date(d.getTime()-d.getTimezoneOffset()*60000); return x.toISOString().slice(0,10); }
+function addDays(d, n){ const c = new Date(d); c.setDate(c.getDate()+n); return c; }
 
 function renderCountdown(){
-  const upcoming = MILESTONES.map(([d,l])=>({d:new Date(d),l})).filter(m=>m.d>=TODAY).sort((a,b)=>a.d-b.d)[0];
+  const upcoming = MILESTONES.map(([d,l])=>({d:new Date(d+'T00:00:00'),l})).filter(m=>m.d>=TODAY).sort((a,b)=>a.d-b.d)[0];
   if(!upcoming){ document.getElementById('countdownBox').innerHTML = ''; return; }
   const days = Math.round((upcoming.d-TODAY)/86400000);
   document.getElementById('countdownBox').innerHTML = `<div class="cd-num">${days}</div><div class="cd-label">days to ${upcoming.l}</div>`;
 }
 
-async function renderCalendar(){
+/* ---------- Habit streak tracker ---------- */
+function computeStreak(log, uptoDate){
+  let streak = 0;
+  let cursor = new Date(uptoDate);
+  while(log[ymd(cursor)]){
+    streak++;
+    cursor = addDays(cursor, -1);
+  }
+  return streak;
+}
+async function renderHabit(){
+  const log = await loadData('habit-meditate-log', {});
+  const todayDone = !!log[ymd(TODAY)];
+  const streak = todayDone ? computeStreak(log, TODAY) : computeStreak(log, addDays(TODAY, -1));
+
+  const numEl = document.getElementById('habitStreakNum');
+  const labelEl = document.getElementById('habitStreakLabel');
+  numEl.textContent = streak;
+  numEl.className = 'habit-streak-num' + (!todayDone && streak>0 ? ' at-risk' : '');
+  labelEl.textContent = streak===1 ? 'day streak' : 'day streak' + (!todayDone && streak>0 ? ' — mark today to keep it' : '');
+
+  const btn = document.getElementById('habitToggleBtn');
+  btn.className = todayDone ? 'btn done' : 'btn';
+  btn.textContent = todayDone ? 'Meditated today' : 'Meditate daily?';
+
+  const days = [];
+  for(let i=20;i>=0;i--) days.push(addDays(TODAY,-i));
+  document.getElementById('habitGrid').innerHTML = days.map(d=>{
+    const ds = ymd(d);
+    const done = !!log[ds];
+    const isToday = ds===ymd(TODAY);
+    return `<div class="habit-day ${done?'done':''} ${isToday?'today':''}" data-habitday="${ds}" title="${ds}"></div>`;
+  }).join('');
+
+  document.querySelectorAll('[data-habitday]').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      const log = await loadData('habit-meditate-log', {});
+      const ds = el.dataset.habitday;
+      log[ds] = !log[ds];
+      await saveData('habit-meditate-log', log);
+      renderHabit();
+    });
+  });
+}
+document.getElementById('habitToggleBtn').addEventListener('click', async ()=>{
+  const log = await loadData('habit-meditate-log', {});
+  log[ymd(TODAY)] = !log[ymd(TODAY)];
+  await saveData('habit-meditate-log', log);
+  renderHabit();
+});
+
+async function renderOneCalendar(ids){
+  const titleEl = document.getElementById(ids.title);
+  if(!titleEl) return;
   const y = calViewDate.getFullYear(), m = calViewDate.getMonth();
-  document.getElementById('calTitle').textContent = calViewDate.toLocaleString('en-GB',{month:'long', year:'numeric'});
+  titleEl.textContent = calViewDate.toLocaleString('en-GB',{month:'long', year:'numeric'});
   const dows = ['Mo','Tu','We','Th','Fr','Sa','Su'];
-  document.getElementById('calDow').innerHTML = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  document.getElementById(ids.dow).innerHTML = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
 
   const firstDay = new Date(y,m,1);
   const startOffset = (firstDay.getDay()+6)%7; // Monday-first
   const daysInMonth = new Date(y,m+1,0).getDate();
   const notes = await loadData('day-notes', {});
+  const externalEvents = await loadData('external-calendar-events', []);
+  const externalByDate = {};
+  externalEvents.forEach(ev=>{ (externalByDate[ev.date] = externalByDate[ev.date] || []).push(ev.name); });
 
   let cells = '';
   for(let i=0;i<startOffset;i++) cells += `<div class="cal-day empty"></div>`;
@@ -1471,21 +1896,27 @@ async function renderCalendar(){
     const isToday = dateStr === ymd(TODAY);
     const milestone = MILESTONES.find(([d])=>d===dateStr);
     const hasNote = !!notes[dateStr];
-    cells += `<div class="cal-day ${isToday?'today':''} ${milestone?'milestone':''} ${hasNote?'has-note':''}" data-date="${dateStr}">
+    const ext = externalByDate[dateStr];
+    cells += `<div class="cal-day ${isToday?'today':''} ${milestone?'milestone':''} ${hasNote?'has-note':''} ${ext?'has-external':''}" data-date="${dateStr}" ${ext?`title="${esc(ext.join(', '))}"`:''}>
       <span class="cal-num">${day}</span>
-      ${milestone?`<span class="cal-tag">${milestone[1]}</span>`:''}
+      ${milestone?`<span class="cal-tag">${esc(milestone[1])}</span>`:''}
+      ${ext?`<span class="cal-ext-dot"></span>`:''}
     </div>`;
   }
-  document.getElementById('calGrid').innerHTML = cells;
+  document.getElementById(ids.grid).innerHTML = cells;
 
-  document.querySelectorAll('.cal-day[data-date]').forEach(el=>{
+  document.querySelectorAll(`#${ids.grid} .cal-day[data-date]`).forEach(el=>{
     el.addEventListener('click', ()=>selectDay(el.dataset.date));
   });
+}
+async function renderCalendar(){
+  for(const ids of CAL_INSTANCES){ await renderOneCalendar(ids); }
 }
 
 async function selectDay(dateStr){
   selectedDay = dateStr;
   const card = document.getElementById('dayNoteCard');
+  if(!card) return;
   card.style.display = 'block';
   document.getElementById('dayNoteLabel').textContent = dateStr;
   const notes = await loadData('day-notes', {});
@@ -1498,14 +1929,79 @@ document.getElementById('dayNoteText').addEventListener('blur', async ()=>{
   await saveData('day-notes', notes);
   renderCalendar();
 });
-document.getElementById('calPrev').addEventListener('click', ()=>{
-  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth()-1, 1);
+function calNav(delta){
+  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth()+delta, 1);
   renderCalendar();
+}
+CAL_INSTANCES.forEach(ids=>{
+  const prevBtn = document.getElementById(ids.prev), nextBtn = document.getElementById(ids.next);
+  if(prevBtn) prevBtn.addEventListener('click', ()=>calNav(-1));
+  if(nextBtn) nextBtn.addEventListener('click', ()=>calNav(1));
 });
-document.getElementById('calNext').addEventListener('click', ()=>{
-  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth()+1, 1);
+
+/* ---------- External calendar (.ics import / feed URL) ---------- */
+function parseICS(text){
+  const events = [];
+  const lines = text.split(/\r\n|\n|\r/);
+  let cur = null;
+  lines.forEach(line=>{
+    if(line.startsWith('BEGIN:VEVENT')){ cur = {}; }
+    else if(line.startsWith('END:VEVENT')){ if(cur && cur.name && cur.date) events.push(cur); cur = null; }
+    else if(cur){
+      if(line.startsWith('SUMMARY')){ cur.name = line.split(':').slice(1).join(':').trim(); }
+      else if(line.startsWith('DTSTART')){
+        const raw = line.split(':').slice(1).join(':').trim();
+        const m = raw.match(/^(\d{4})(\d{2})(\d{2})/);
+        if(m) cur.date = `${m[1]}-${m[2]}-${m[3]}`;
+      }
+    }
+  });
+  return events;
+}
+async function storeExternalEvents(events){
+  await saveData('external-calendar-events', events);
   renderCalendar();
+}
+document.getElementById('icsFileInput').addEventListener('change', async e=>{
+  const file = e.target.files[0]; if(!file) return;
+  try{
+    const text = await file.text();
+    const events = parseICS(text);
+    await storeExternalEvents(events);
+    document.getElementById('icsStatus').textContent = `Imported ${events.length} event(s) from file.`;
+  }catch(err){
+    document.getElementById('icsStatus').textContent = 'Could not read that file — expected a standard .ics export.';
+  }
 });
+document.getElementById('icsFetchBtn').addEventListener('click', async ()=>{
+  const url = document.getElementById('icsUrlInput').value.trim();
+  const statusEl = document.getElementById('icsStatus');
+  if(!url){ statusEl.textContent = 'Paste a calendar feed URL first.'; return; }
+  statusEl.textContent = 'Fetching…';
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const events = parseICS(text);
+    if(!events.length) throw new Error('No events found — check this is a direct .ics feed link, not a calendar webpage.');
+    await storeExternalEvents(events);
+    statusEl.textContent = `Fetched ${events.length} event(s) live from the feed.`;
+  }catch(err){
+    statusEl.textContent = 'Live fetch blocked (likely CORS — Google/Outlook feeds usually block direct browser fetches). Use "Import .ics file" instead: download the file from your calendar settings and import it here periodically.';
+  }
+});
+
+
+document.getElementById('savePriorities').addEventListener('click', async ()=>{
+  const arr=[0,1,2].map(i=>({
+    title:document.querySelector(`[data-ptitle="${i}"]`).value.trim(),
+    status:document.querySelector(`[data-pstatus="${i}"]`).value.trim(),
+    action:document.querySelector(`[data-paction="${i}"]`).value.trim()
+  }));
+  await saveData('weekly-priorities',arr); flash('priorityFlash'); renderToday();
+});
+document.getElementById('exportBtn').addEventListener('click',exportBackup);
+document.getElementById('importFile').addEventListener('change',async e=>{ try{ if(e.target.files[0]) await importBackup(e.target.files[0]); }catch(err){ alert('Import failed: '+err.message); } });
 
 /* ======================= WALL DISPLAY MODE ======================= */
 document.getElementById('wallModeBtn').addEventListener('click', ()=>{
@@ -1524,6 +2020,7 @@ document.getElementById('exitWallBtn').addEventListener('click', ()=>{
 
 /* ======================= INIT ======================= */
 (async function init(){
+  await renderToday();
   renderTopStats();
   renderGoals();
   renderCapMatrix();
@@ -1534,9 +2031,7 @@ document.getElementById('exitWallBtn').addEventListener('click', ()=>{
   await renderOppLog();
   await renderReviewForm();
   await renderNotNow();
-  renderTimeline('tlNear','tlNearLegend', TL_NEAR, TL_NEAR_MILESTONE, TL_NEAR_RANGE);
-  renderTimeline('tlNearWall','tlNearWallLegend', TL_NEAR, TL_NEAR_MILESTONE, TL_NEAR_RANGE);
-  renderTimeline('tlStrategic','tlStrategicLegend', TL_STRAT, TL_STRAT_MILESTONE, TL_STRAT_RANGE);
+  renderTimeline('tlStrategic','tlStrategicLegend', TL_STRAT, TL_STRAT_MILESTONE, TL_STRAT_RANGE, 'year');
   renderBoard();
   await renderCadence();
   await renderContacts();
@@ -1549,6 +2044,9 @@ document.getElementById('exitWallBtn').addEventListener('click', ()=>{
   await renderTasks();
   renderCountdown();
   await renderCalendar();
+  await renderHabit();
+  await renderWeekPlanner();
+  await renderHouseItems();
 })();
 </script>
 </body>
