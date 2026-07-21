@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Strategy — Operating Panel</title>
+<style>
+  :root{
+    --paper:#FBF9F4;
+    --paper-alt:#F3EEE3;
+    --ink:#17263D;
+    --ink-soft:#5B6472;
+    --line:#DDD6C4;
+    --rhythm:#2F9E64;
+    --rhythm-dim:#BFE3CD;
+    --rose:#B5424A;
+    --gold:#B8862E;
+    --navy-deep:#101B2C;
+    --mono: 'SF Mono', 'Cascadia Code', Consolas, 'Roboto Mono', monospace;
+    --serif: 'Iowan Old Style','Palatino Linotype','Book Antiqua', Georgia, serif;
+    --sans: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);}
+  body{-webkit-font-smoothing:antialiased;}
+
+  /* ---------- Header / signature rhythm strip ---------- */
+  header.top{background:var(--navy-deep);color:var(--paper);padding:22px clamp(16px,4vw,48px) 0;position:relative;overflow:hidden;}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:14px;}
+  .top-title h1{font-family:var(--serif);font-weight:600;font-size:clamp(22px,3vw,30px);margin:0 0 4px;letter-spacing:.2px;}
+  .top-title p{margin:0;color:#B9C3D2;font-size:13px;letter-spacing:.3px;}
+  .top-stats{display:flex;gap:22px;flex-wrap:wrap;}
+  .stat{font-family:var(--mono);text-align:right;}
+  .stat .num{display:block;font-size:18px;color:var(--rhythm);letter-spacing:.5px;}
+  .stat .lbl{display:block;font-size:10px;color:#8CA0B8;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+  .rhythm-strip{height:34px;margin-top:6px;}
+  .rhythm-strip svg{width:100%;height:100%;display:block;}
+  .rhythm-strip path{fill:none;stroke:var(--rhythm);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .rhythm-line-bg{stroke:#233450;}
+  .rhythm-line{stroke-dasharray:1200;stroke-dashoffset:1200;animation:sweep 7s linear infinite;}
+  @keyframes sweep{to{stroke-dashoffset:0;}}
+  @media (prefers-reduced-motion: reduce){.rhythm-line{animation:none;stroke-dashoffset:0;}}
+
+  /* ---------- Tabs (patient-chart-divider metaphor) ---------- */
+  nav.tabs{display:flex;gap:6px;padding:0 clamp(12px,4vw,44px);background:var(--navy-deep);}
+  nav.tabs button{
+    font-family:var(--sans);font-size:13.5px;font-weight:600;letter-spacing:.2px;
+    background:#233450;color:#C7D2E0;border:none;border-radius:8px 8px 0 0;
+    padding:11px 18px;cursor:pointer;transition:background .15s, color .15s;
+    position:relative;top:1px;
+  }
+  nav.tabs button:hover{background:#2C4363;color:#fff;}
+  nav.tabs button.active{background:var(--paper);color:var(--ink);}
+  nav.tabs button.active::after{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:var(--rhythm);border-radius:8px 8px 0 0;
+  }
+
+  main{max-width:1180px;margin:0 auto;padding:30px clamp(14px,4vw,44px) 90px;}
+  section.panel{display:none;}
+  section.panel.active{display:block;animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  h2.section-title{font-family:var(--serif);font-size:22px;margin:0 0 4px;color:var(--ink);}
+  p.section-sub{color:var(--ink-soft);margin:0 0 22px;font-size:14px;max-width:760px;line-height:1.5;}
+
+  .grid{display:grid;gap:16px;}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:820px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr;}}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px;}
+  .card h3{font-family:var(--serif);font-size:16px;margin:0 0 8px;color:var(--ink);}
+  .card .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--rhythm);margin-bottom:6px;display:block;}
+  .card p{font-size:13.5px;line-height:1.55;color:var(--ink-soft);margin:0 0 8px;}
+  .card p:last-child{margin-bottom:0;}
+  .card p b{color:var(--ink);font-weight:600;}
+
+  .pill{display:inline-block;font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--line);color:var(--ink-soft);margin-right:6px;}
+  .pill.rose{border-color:#E6BEC2;color:var(--rose);background:#FBF0F1;}
+  .pill.gold{border-color:#E7D3A6;color:var(--gold);background:#FBF4E4;}
+  .pill.rhythm{border-color:var(--rhythm-dim);color:var(--rhythm);background:#EFFAF3;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+  table.styled{border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  th{background:var(--navy-deep);color:var(--paper);text-align:left;padding:9px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;font-weight:600;}
+  td{padding:9px 12px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top;}
+  tr:nth-child(even) td{background:var(--paper-alt);}
+  td b, td strong{color:var(--ink);}
+
+  details.goal{border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:10px;overflow:hidden;}
+  details.goal summary{cursor:pointer;padding:13px 16px;font-family:var(--serif);font-size:15.5px;color:var(--ink);list-style:none;display:flex;justify-content:space-between;align-items:center;}
+  details.goal summary::-webkit-details-marker{display:none;}
+  details.goal summary .arrow{font-family:var(--mono);color:var(--rhythm);transition:transform .15s;}
+  details.goal[open] summary .arrow{transform:rotate(90deg);}
+  details.goal .goal-body{padding:0 18px 16px;font-size:13.5px;color:var(--ink-soft);line-height:1.55;}
+  details.goal .goal-body div{margin-bottom:8px;}
+  details.goal .goal-body b{color:var(--ink);}
+
+  /* ---------- Timeline / gantt ---------- */
+  .timeline-wrap{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px 20px 14px;overflow-x:auto;}
+  .tl-axis{position:relative;height:26px;margin-left:230px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);min-width:520px;}
+  .tl-axis span{position:absolute;transform:translateX(-50%);bottom:6px;}
+  .tl-row{display:flex;align-items:center;min-height:34px;position:relative;}
+  .tl-label{width:230px;flex-shrink:0;font-size:12.5px;color:var(--ink);padding-right:10px;}
+  .tl-track{position:relative;flex:1;height:20px;min-width:520px;}
+  .tl-bar{position:absolute;top:2px;height:16px;border-radius:4px;opacity:.92;}
+  .tl-milestone{position:absolute;top:1px;width:10px;height:10px;background:var(--rose);border-radius:2px;transform:translateX(-50%) rotate(45deg);}
+  .tl-today{position:absolute;top:-6px;bottom:-6px;width:0;border-left:2px dashed var(--rose);z-index:2;}
+  .tl-today-label{position:absolute;top:-18px;font-family:var(--mono);font-size:10px;color:var(--rose);transform:translateX(-50%);font-weight:600;}
+  .tl-legend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-soft);}
+  .tl-legend span{display:inline-flex;align-items:center;gap:6px;}
+  .tl-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  /* ---------- checklist ---------- */
+  .checklist{list-style:none;margin:0;padding:0;}
+  .checklist li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13.5px;line-height:1.5;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist input[type=checkbox]{margin-top:3px;width:16px;height:16px;accent-color:var(--rhythm);flex-shrink:0;cursor:pointer;}
+  .checklist label{cursor:pointer;color:var(--ink-soft);}
+  .checklist li.done label{color:#A6AEB8;text-decoration:line-through;}
+  .week-block{margin-bottom:20px;}
+  .week-block h4{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--rhythm);margin:0 0 8px;}
+
+  /* ---------- forms ---------- */
+  label.field-label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+  input[type=text], input[type=number], select, textarea{
+    width:100%;font-family:var(--sans);font-size:13.5px;padding:8px 10px;border:1px solid var(--line);
+    border-radius:6px;background:#fff;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:50px;}
+  input[type=range]{width:100%;accent-color:var(--rhythm);}
+  button.btn{font-family:var(--sans);font-weight:600;font-size:13px;background:var(--rhythm);color:#fff;border:none;
+    padding:10px 18px;border-radius:7px;cursor:pointer;transition:background .15s;}
+  button.btn:hover{background:#278753;}
+  button.btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);}
+  button.btn.secondary:hover{background:var(--paper-alt);}
+  .save-flash{font-family:var(--mono);font-size:12px;color:var(--rhythm);margin-left:10px;opacity:0;transition:opacity .2s;}
+  .save-flash.show{opacity:1;}
+
+  .kpi-row{display:grid;grid-template-columns:2fr 1fr 1.6fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .kpi-row:last-child{border-bottom:none;}
+  .kpi-row .kpi-name{font-size:13px;color:var(--ink);}
+  .kpi-row .kpi-target{font-family:var(--mono);font-size:11px;color:var(--ink-soft);}
+
+  .score-dim{display:grid;grid-template-columns:1.6fr 2fr 40px;gap:12px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .score-dim:last-child{border-bottom:none;}
+  .score-dim .dname{font-size:12.5px;color:var(--ink);}
+  .score-dim .dval{font-family:var(--mono);font-size:13px;color:var(--rhythm);text-align:right;font-weight:700;}
+  .score-result{margin-top:16px;padding:16px 18px;border-radius:10px;border:1px solid var(--line);}
+  .score-result.take{background:#EFFAF3;border-color:var(--rhythm-dim);}
+  .score-result.conditional{background:#FBF4E4;border-color:#E7D3A6;}
+  .score-result.decline{background:#FBF0F1;border-color:#E6BEC2;}
+  .score-result .verdict{font-family:var(--serif);font-size:17px;margin-bottom:4px;}
+  .score-total{font-family:var(--mono);font-size:26px;color:var(--ink);}
+
+  .notnow-item{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start;}
+  .notnow-item:last-child{border-bottom:none;}
+  .notnow-item .nn-text{font-size:13.5px;color:var(--ink);}
+  .notnow-item .nn-review{font-size:11.5px;color:var(--ink-soft);font-family:var(--mono);margin-top:3px;}
+
+  .footer-note{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-soft);font-family:var(--mono);text-align:center;}
+
+  /* ---------- v2 additions ---------- */
+  .thesis-banner{background:var(--navy-deep);color:var(--paper);border-radius:12px;padding:22px 26px;margin-bottom:20px;}
+  .thesis-banner .eyebrow{color:var(--rhythm);}
+  .thesis-banner p{font-family:var(--serif);font-style:italic;font-size:16px;line-height:1.6;color:#EAF0F7;margin:6px 0 0;}
+  .kill-criteria{margin-top:14px;padding-top:12px;border-top:1px solid #2C4363;}
+  .kill-criteria summary{cursor:pointer;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#8CA0B8;}
+  .kill-criteria div{margin-top:10px;font-size:12.5px;color:#C7D2E0;line-height:1.6;}
+
+  .flywheel-loop{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;padding:18px 10px;}
+  .flywheel-node{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--ink);white-space:nowrap;}
+  .flywheel-node.active{border-color:var(--rhythm);color:var(--rhythm);font-weight:600;}
+  .flywheel-arrow{color:var(--ink-soft);font-size:14px;}
+
+  .tier-badge{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;}
+  .tier-badge.t1{background:#EFFAF3;color:var(--rhythm);border:1px solid var(--rhythm-dim);}
+  .tier-badge.t2{background:#FBF4E4;color:var(--gold);border:1px solid #E7D3A6;}
+  .tier-badge.t3{background:#F2F0F6;color:#6B4FA0;border:1px solid #D8D0E8;}
+  .tier-badge.overdue{background:#FBF0F1;color:var(--rose);border:1px solid #E6BEC2;}
+
+  .contact-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;}
+  .contact-row:last-child{border-bottom:none;}
+  .contact-row input, .contact-row select{font-size:12px;padding:5px 7px;}
+
+  .kanban{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;overflow-x:auto;}
+  @media (max-width:1000px){.kanban{grid-template-columns:repeat(3,1fr);}}
+  .kanban-col{background:var(--paper-alt);border-radius:8px;padding:8px;min-height:90px;}
+  .kanban-col h5{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft);margin:0 0 8px;text-align:center;}
+  .kanban-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:7px 9px;font-size:11.5px;margin-bottom:6px;color:var(--ink);}
+  .kanban-card select{width:100%;margin-top:4px;font-size:10px;padding:2px;}
+
+  .journal-entry{border-left:3px solid var(--rhythm);padding:8px 0 8px 12px;margin-bottom:10px;font-size:12.5px;}
+  .journal-entry .je-date{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);}
+  .journal-entry .je-text{color:var(--ink);margin-top:2px;}
+
+  .board-seat{border-bottom:1px solid var(--line);padding:10px 0;font-size:13px;}
+  .board-seat:last-child{border-bottom:none;}
+  .board-seat .seat-name{font-weight:600;color:var(--ink);}
+  .board-seat .seat-meta{font-family:var(--mono);font-size:10.5px;color:var(--rhythm);margin-left:8px;}
+
+  .cadence-check{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;color:var(--ink-soft);}
+  .cadence-check input{accent-color:var(--rhythm);}
+
+  .thesis-gate-box{background:#FBF4E4;border:1px solid #E7D3A6;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--ink);}
+  .thesis-gate-box label{display:flex;align-items:center;gap:8px;cursor:pointer;}
+
+  /* ---------- Progress tab: segmented block bars ---------- */
+  .segbar-group{margin-bottom:22px;}
+  .segbar-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .segbar-head h3{font-family:var(--serif);font-size:15.5px;margin:0;color:var(--ink);}
+  .segbar-frac{font-family:var(--mono);font-size:13px;color:var(--rhythm);font-weight:700;}
+  .segbar-track{display:flex;gap:4px;}
+  .segbar-block{flex:1;height:34px;border-radius:5px;border:2px solid var(--line);background:#fff;cursor:pointer;transition:background .15s, border-color .15s;position:relative;}
+  .segbar-block.done{background:var(--rhythm);border-color:var(--rhythm);}
+  .segbar-block:active{transform:scale(0.96);}
+  .segbar-labels{display:flex;gap:4px;margin-top:5px;}
+  .segbar-labels span{flex:1;font-size:9.5px;color:var(--ink-soft);text-align:center;line-height:1.25;word-break:break-word;}
+
+  /* ---------- Landscape / wide-screen (Surface Pro 4 and similar) ---------- */
+  @media (min-width:1000px) and (orientation:landscape){
+    #progressGroups{display:grid;grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));gap:0 28px;align-items:start;}
+    .segbar-block{height:44px;}
+    .segbar-labels span{font-size:10.5px;}
+    main{padding-left:clamp(16px,3vw,40px);padding-right:clamp(16px,3vw,40px);}
+    .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+    .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+    #panel-planner .card{max-width:640px;}
+  }
+  @media (min-width:1300px) and (orientation:landscape){
+    body.wall-mode #progressGroups{grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));}
+    body.wall-mode .segbar-block{height:64px;}
+  }
+
+  /* ---------- Workload capacity ---------- */
+  .capacity-track{height:26px;background:var(--paper-alt);border-radius:8px;overflow:hidden;border:1px solid var(--line);position:relative;}
+  .capacity-fill{height:100%;background:var(--rhythm);transition:width .2s, background .2s;}
+  .capacity-fill.over{background:var(--rose);}
+  .capacity-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);}
+  .task-row{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .task-row:last-child{border-bottom:none;}
+  .task-row.done .task-name{text-decoration:line-through;color:#A6AEB8;}
+  .task-name{font-size:13px;color:var(--ink);}
+  .task-hours{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);background:var(--paper-alt);padding:2px 8px;border-radius:10px;}
+  .rank-btns{display:flex;gap:3px;}
+  .rank-btns button{width:26px;height:26px;border:1px solid var(--line);background:#fff;border-radius:5px;cursor:pointer;font-size:12px;color:var(--ink-soft);}
+  .rank-btns button:hover{background:var(--paper-alt);}
+
+  /* ---------- Planner / calendar ---------- */
+  .cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .cal-header button{width:34px;height:34px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;font-size:15px;color:var(--ink);}
+  .cal-header h3{font-family:var(--serif);font-size:17px;margin:0;color:var(--ink);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .cal-dow{font-family:var(--mono);font-size:10px;text-transform:uppercase;color:var(--ink-soft);text-align:center;padding-bottom:4px;}
+  .cal-day{aspect-ratio:1;border:1px solid var(--line);border-radius:7px;padding:5px 6px;font-size:12px;color:var(--ink);cursor:pointer;position:relative;background:#fff;}
+  .cal-day.empty{border:none;cursor:default;}
+  .cal-day.today{border-color:var(--rhythm);border-width:2px;font-weight:700;}
+  .cal-day.milestone{background:#FBF0F1;border-color:#E6BEC2;}
+  .cal-day.has-note::after{content:"";position:absolute;bottom:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+  .cal-day .cal-num{font-family:var(--mono);}
+  .cal-day .cal-tag{display:block;font-size:8.5px;color:var(--rose);line-height:1.1;margin-top:2px;}
+  .countdown-box{background:var(--navy-deep);color:#fff;border-radius:10px;padding:16px 20px;margin-bottom:18px;text-align:center;}
+  .countdown-box .cd-num{font-family:var(--mono);font-size:34px;color:var(--rhythm);font-weight:700;}
+  .countdown-box .cd-label{font-size:12.5px;color:#B9C3D2;margin-top:2px;}
+
+  /* ---------- Wall display mode ---------- */
+  #wallModeBtn{background:transparent;border:1px solid #3A4E6B;color:#B9C3D2;border-radius:7px;padding:6px 12px;font-size:11.5px;font-family:var(--mono);cursor:pointer;}
+  #wallModeBtn:hover{background:#233450;}
+  body.wall-mode header.top .top-stats, body.wall-mode nav.tabs button:not(.active){display:none;}
+  body.wall-mode main{max-width:100%;padding:36px 48px;}
+  body.wall-mode .section-title{font-size:34px;}
+  body.wall-mode .section-sub{font-size:16px;}
+  body.wall-mode .segbar-head h3{font-size:22px;}
+  body.wall-mode .segbar-frac{font-size:20px;}
+  body.wall-mode .segbar-block{height:52px;}
+  body.wall-mode .segbar-labels span{font-size:12px;}
+  body.wall-mode .capacity-track{height:38px;}
+  body.wall-mode .capacity-label{font-size:17px;}
+  body.wall-mode .countdown-box .cd-num{font-size:52px;}
+  body.wall-mode .countdown-box .cd-label{font-size:16px;}
+  body.wall-mode .tl-label{font-size:15px;}
+  body.wall-mode .tl-row{min-height:40px;}
+  body.wall-mode .tl-axis{height:32px;font-size:13px;}
+  body.wall-mode .tl-today-label{font-size:13px;}
+  body.wall-mode .tl-legend{font-size:14px;}
+  body.wall-mode .eyebrow{font-size:12.5px;}
+  body.wall-mode .card h3{font-size:20px;}
+  body.wall-mode nav.tabs{padding:0 48px;}
+  #exitWallBtn{display:none;position:fixed;top:14px;right:14px;z-index:999;background:var(--navy-deep);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;opacity:.55;}
+  body.wall-mode #exitWallBtn{display:block;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="top-title">
+      <h1>Career Strategy — Operating Panel</h1>
+      <p>v2 · one thesis, disciplined by systems, not eight parallel identities</p>
+    </div>
+    <div class="top-stats" id="topStats"></div>
+    <button id="wallModeBtn">⛶ Wall Display Mode</button>
+  </div>
+  <div class="rhythm-strip">
+    <svg viewBox="0 0 1000 34" preserveAspectRatio="none">
+      <path class="rhythm-line-bg" d="M0,17 L1000,17"/>
+      <path class="rhythm-line" d="M0,17 L120,17 L145,17 L160,4 L175,30 L190,10 L205,17 L260,17 L340,17 L365,17 L380,4 L395,30 L410,10 L425,17 L480,17 L560,17 L585,17 L600,4 L615,30 L630,10 L645,17 L700,17 L780,17 L805,17 L820,4 L835,30 L850,10 L865,17 L920,17 L1000,17"/>
+    </svg>
+  </div>
+</header>
+
+<button id="exitWallBtn">✕ Exit wall mode</button>
+
+<nav class="tabs" id="tabNav">
+  <button data-tab="overview" class="active">Overview</button>
+  <button data-tab="progress">Progress</button>
+  <button data-tab="planner">Planner</button>
+  <button data-tab="longterm">Long-Term Strategy</button>
+  <button data-tab="shortterm">Short-Term (Now)</button>
+  <button data-tab="systems">Systems</button>
+  <button data-tab="review">Review Worksheets</button>
+</nav>
+
+<main>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section class="panel active" id="panel-overview">
+    <h2 class="section-title">The thesis, and where things stand</h2>
+    <p class="section-sub">Everything else in this panel is a working-out of the paragraph below. v2 exists because v1 had four parallel pillars and no single axle — this is the axle.</p>
+
+    <div class="thesis-banner">
+      <span class="eyebrow">The Thesis</span>
+      <p>"I will become the clinician-researcher who defines how AI-enabled electrophysiology devices and tools are rigorously validated and safely moved from prototype into real-world cardiac rhythm care — building the evidence infrastructure that lets promising AI-EP technology cross the translation gap safely, and using that authority to shape both the devices themselves and the standards by which they earn clinical trust."</p>
+      <details class="kill-criteria">
+        <summary>Kill criteria — when this thesis gets revised, not just repeated</summary>
+        <div>1. AI-EP validation commoditises into automated regulatory pathways that no longer need a clinician-authority.<br>
+        2. Post-PhD, this research direction proves indistinguishable from several other UK clinician-researchers'.<br>
+        3. Procedural EP excellence and this research direction turn out to be in genuine, unresolvable tension.<br>
+        Tested explicitly at every Five-Year Reset (Systems tab) — not assumed away.</div>
+      </details>
+    </div>
+
+    <div class="grid cols-4" style="margin-bottom:16px;">
+      <div class="card"><span class="eyebrow">Now</span><p><b>IMT1</b>, 80% LTFT, competency-based ARCP. Started Aug 2026.</p></div>
+      <div class="card"><span class="eyebrow">Next milestone</span><p><b>ST4 entry</b>, cardiology national recruitment, targeting Aug 2030.</p></div>
+      <div class="card"><span class="eyebrow">Load-bearing projects</span><p>MSc dissertation + AI-EP scoping review — the founding data points of the thesis itself.</p></div>
+      <div class="card"><span class="eyebrow">ACF decision</span><p><b>Route A</b> (ACF at Leicester) + parallel Route B hedge (direct PhD route) — not a forced binary.</p></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <span class="eyebrow">The Flywheel</span>
+      <h3>How the four pillars actually connect</h3>
+      <p style="margin-bottom:10px;">v1 sequenced four pillars as parallel tracks. A strategy compounds only if they're a loop — clinical work generating ideas that become funded research, that becomes technology, that changes patient care and reputation, that returns richer to clinical work.</p>
+      <div class="flywheel-loop">
+        <span class="flywheel-node active">EP clinical work</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Ideas</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Research</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Funding</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Industry</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Technology</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Patient care</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Reputation</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node">Opportunity</span><span class="flywheel-arrow">→</span>
+        <span class="flywheel-node active">EP clinical work</span>
+      </div>
+      <p style="margin-top:6px;font-size:12px;">Every major decision should be checkable against one question: which node does this strengthen, and does it hand off cleanly to the next one? A project that dead-ends breaks the loop even if it looks productive alone.</p>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Guiding principles</span>
+      <p>1. Every project is scored first against the thesis, then against the five domains (clinical / research / AI / innovation / teaching) — serving domains without serving the thesis is a hobby, fine, but label it honestly.<br>
+      2. Never run an AI/technical project without a named supervisor, a defined output, and a line back to the thesis.<br>
+      3. Choose posts and fellowships for the <i>people</i>, not just the institution — log the reasoning in the Decision Journal.<br>
+      4. Revisit this panel on the full cadence (Systems tab) — weekly, monthly, quarterly, six-monthly, annually, and at the Five-Year Reset.<br>
+      5. Keep two doors open over one marginally-better closed door, until ST4/5.</p>
+    </div>
+  </section>
+
+  <!-- ================= PROGRESS ================= -->
+  <section class="panel" id="panel-progress">
+    <h2 class="section-title">Progress</h2>
+    <p class="section-sub">Block-by-block, not smooth percentages — tap a block to fill it. Built to be read from across a room.</p>
+
+    <div class="card" style="margin-bottom:20px;">
+      <span class="eyebrow">Workload capacity — what's actually on your plate right now</span>
+      <h3>Are you overcommitted this week?</h3>
+      <div class="capacity-track" style="margin:10px 0 14px;">
+        <div class="capacity-fill" id="capacityFill" style="width:0%;"></div>
+        <div class="capacity-label" id="capacityLabel">0 / 10 hrs</div>
+      </div>
+      <div id="taskRows"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <input type="text" id="taskName" placeholder="Task (e.g. MRCP Part 2 prep)" style="flex:2;min-width:160px;">
+        <input type="number" id="taskHours" placeholder="hrs/wk" style="flex:0 0 90px;" min="0" step="0.5">
+        <button class="btn secondary" id="taskAdd" style="padding:8px 14px;">Add task</button>
+      </div>
+      <p style="margin-top:10px;font-size:11.5px;color:var(--ink-soft);">Capacity is your discretionary time budget once clinical and family floors are subtracted (~8–11 hrs/week, per the Time Budget system) — adjust the number below if your real figure differs.</p>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+        <label class="field-label" style="margin:0;">Capacity (hrs/week):</label>
+        <input type="number" id="capacitySetting" value="10" style="width:70px;" min="1" step="0.5">
+      </div>
+    </div>
+
+    <div id="progressGroups"></div>
+
+    <div class="card" style="margin-top:20px;">
+      <span class="eyebrow">Near-term timeline</span>
+      <h3>July 2026 – 2032</h3>
+      <div class="timeline-wrap" style="border:none;padding:14px 0 4px;">
+        <div id="tlNearWall"></div>
+        <div class="tl-legend" id="tlNearWallLegend"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PLANNER ================= -->
+  <section class="panel" id="panel-planner">
+    <h2 class="section-title">Planner</h2>
+    <p class="section-sub">Your milestones plotted on an actual calendar, plus a running countdown to the next one.</p>
+
+    <div class="countdown-box" id="countdownBox"></div>
+
+    <div class="card">
+      <div class="cal-header">
+        <button id="calPrev">‹</button>
+        <h3 id="calTitle"></h3>
+        <button id="calNext">›</button>
+      </div>
+      <div class="cal-grid" id="calDow"></div>
+      <div class="cal-grid" id="calGrid" style="margin-top:5px;"></div>
+    </div>
+
+    <div class="card" id="dayNoteCard" style="margin-top:16px;display:none;">
+      <span class="eyebrow" id="dayNoteLabel">Select a day</span>
+      <textarea id="dayNoteText" placeholder="Note for this day…" style="margin-top:8px;"></textarea>
+    </div>
+  </section>
+
+  <!-- ================= LONG TERM ================= -->
+  <section class="panel" id="panel-longterm">
+    <h2 class="section-title">Long-term strategy (2026 – 2041)</h2>
+    <p class="section-sub">The four pillars, the full pathway, and the ten career goals — expand any goal for why it matters, what it needs, and the risks.</p>
+
+    <div class="timeline-wrap" style="margin-bottom:26px;">
+      <div id="tlStrategic"></div>
+      <div class="tl-legend" id="tlStrategicLegend"></div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:16px;margin:26px 0 10px;">The four pillars</h3>
+    <div class="grid cols-4" style="margin-bottom:28px;">
+      <div class="card"><span class="eyebrow">1 · 2026–2030</span><h3>Clinical credibility</h3><p>Unimpeachable IMT + MRCP performance. Everything else is discounted if this is weak.</p></div>
+      <div class="card"><span class="eyebrow">2 · 2026–2034</span><h3>Academic base</h3><p>ACF + PhD, built from the current MSc/dissertation/scoping-review springboard.</p></div>
+      <div class="card"><span class="eyebrow">3 · 2030–2039</span><h3>EP specialisation</h3><p>Deliberate EP sub-specialty choice + AI-forward fellowship, so clinical and research specialisation reinforce each other.</p></div>
+      <div class="card"><span class="eyebrow">4 · 2034+</span><h3>Innovation layer</h3><p>Devices, patents, industry — layered on an established base, not chased early.</p></div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:16px;margin:26px 0 10px;">Career goals</h3>
+    <div id="goalsList"></div>
+
+    <h3 style="font-family:var(--serif);font-size:16px;margin:30px 0 10px;">Capability matrix</h3>
+    <table class="styled">
+      <thead><tr><th>Capability</th><th>Now</th><th>Target</th><th>Imp.</th><th>Verification method</th><th>Prioritise when</th></tr></thead>
+      <tbody id="capMatrixBody"></tbody>
+    </table>
+  </section>
+
+  <!-- ================= SHORT TERM ================= -->
+  <section class="panel" id="panel-shortterm">
+    <h2 class="section-title">Short-term — what you're actually working toward</h2>
+    <p class="section-sub">The next six years in detail, the four live projects, and a checkable 90-day plan that remembers where you left off.</p>
+
+    <div class="timeline-wrap" style="margin-bottom:26px;">
+      <div id="tlNear"></div>
+      <div class="tl-legend" id="tlNearLegend"></div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:16px;margin:26px 0 10px;">Active projects</h3>
+    <div class="grid cols-2" style="margin-bottom:10px;" id="projectsGrid"></div>
+
+    <h3 style="font-family:var(--serif);font-size:16px;margin:30px 0 10px;">First 90-day plan <span class="save-flash" id="ninetyFlash">saved</span></h3>
+    <div id="ninetyDayContainer"></div>
+  </section>
+
+  <!-- ================= SYSTEMS ================= -->
+  <section class="panel" id="panel-systems">
+    <h2 class="section-title">Systems, not years</h2>
+    <p class="section-sub">The strategic review's core structural finding: a list of good intentions doesn't compound. These are the systems that make the plan self-correcting over 15 years instead of fixed at whatever felt right when it was written.</p>
+
+    <div class="grid cols-2" style="align-items:start;margin-bottom:20px;">
+      <div class="card">
+        <span class="eyebrow">Personal Board of Directors</span>
+        <h3>Governance, not just goodwill</h3>
+        <p style="margin-bottom:10px;">A mentor list is goodwill. A board meets on a defined cadence and is shown the same review material used at the 6-month review, explicitly asked to challenge, not just advise.</p>
+        <div id="boardList"></div>
+      </div>
+
+      <div class="card">
+        <span class="eyebrow">Cadence checklist</span>
+        <h3>This week / this month</h3>
+        <p style="margin-bottom:10px;">The full Personal Operating System rhythm — weekly, monthly, quarterly, six-monthly, annual, Five-Year Reset. Tick off this cycle's items; they reset automatically next visit is up to you.</p>
+        <div id="cadenceChecklist"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <span class="eyebrow">Relationship capital system</span>
+      <h3>Tiered log, not a venue list</h3>
+      <p style="margin-bottom:10px;">Tier 1 = active collaborator/supervisor-track, reviewed monthly. Tier 2 = warm contact, quarterly. Tier 3 = met once, annually. A contact turns red when its tier's review is overdue.</p>
+      <div id="contactRows"></div>
+      <div class="contact-row" style="border-bottom:none;padding-top:10px;">
+        <input type="text" id="contactName" placeholder="Name">
+        <select id="contactTier"><option value="1">Tier 1</option><option value="2" selected>Tier 2</option><option value="3">Tier 3</option></select>
+        <input type="text" id="contactNote" placeholder="Note (who / thesis relevance)">
+        <input type="text" id="contactDate" placeholder="Last contact (YYYY-MM-DD)" value="">
+        <button class="btn secondary" id="contactAdd" style="padding:7px 12px;font-size:12px;">Add</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <span class="eyebrow">Research pipeline</span>
+      <h3>Throughput, not a project list</h3>
+      <p style="margin-bottom:10px;">A flat project list shows what exists. This shows whether the research engine is actually working — front-loaded (nothing finishing) or running dry (nothing new entering) are both visible here.</p>
+      <div class="kanban" id="pipelineKanban"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <input type="text" id="pipelineInput" placeholder="Add a new pipeline item…" style="flex:1;">
+        <button class="btn secondary" id="pipelineAdd" style="padding:7px 12px;font-size:12px;">Add</button>
+      </div>
+    </div>
+
+    <div class="grid cols-2" style="align-items:start;margin-bottom:20px;">
+      <div class="card">
+        <span class="eyebrow">Decision journal</span>
+        <h3>Calibrates every other system</h3>
+        <p style="margin-bottom:10px;">Every 350+ opportunity, every explicit decline, the Route A/B call — logged with reasoning now, reviewed against the outcome later. This is the only way the scoring weights become genuinely calibrated rather than fixed at first guess.</p>
+        <textarea id="journalDecision" placeholder="What did you decide?" style="margin-bottom:8px;"></textarea>
+        <textarea id="journalReasoning" placeholder="Why, at the time?" style="margin-bottom:8px;"></textarea>
+        <button class="btn" id="journalAdd">Log this decision</button>
+        <span class="save-flash" id="journalFlash">saved</span>
+        <div id="journalList" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="card">
+        <span class="eyebrow">Energy management</span>
+        <h3>Not a mood diary</h3>
+        <p style="margin-bottom:10px;">A short structured weekly note — distinct from a generic wellbeing check-in — that catches burnout signal months before a 6-month review would.</p>
+        <input type="text" id="energyDepleted" placeholder="This week's highest energy-cost activity…" style="margin-bottom:8px;">
+        <input type="text" id="energyThesis" placeholder="Was it thesis-aligned? (yes/no/partly)" style="margin-bottom:8px;">
+        <input type="text" id="energyRestored" placeholder="One thing that genuinely restored energy…" style="margin-bottom:8px;">
+        <button class="btn" id="energyAdd">Log this week</button>
+        <span class="save-flash" id="energyFlash">saved</span>
+        <div id="energyList" style="margin-top:14px;"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <span class="eyebrow">Family operating agreement</span>
+      <h3>Written jointly, not assumed</h3>
+      <p style="margin-bottom:10px;">Deliberately short — its content should come from a real conversation, not this app. Autosaves as you type.</p>
+      <label class="field-label">Geographic limits (relocation for fellowship/ST4)</label>
+      <textarea id="foaGeo" style="margin-bottom:10px;"></textarea>
+      <label class="field-label">Timing preferences for children, if relevant</label>
+      <textarea id="foaChildren" style="margin-bottom:10px;"></textarea>
+      <label class="field-label">Partner career interaction with Route A/B and relocation</label>
+      <textarea id="foaPartner" style="margin-bottom:10px;"></textarea>
+      <label class="field-label">What triggers a joint re-negotiation of the whole plan</label>
+      <textarea id="foaTriggers"></textarea>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Time budget</span>
+      <h3>The discretionary hours the Opportunity Framework is actually allocating</h3>
+      <table class="styled" style="margin-top:8px;">
+        <thead><tr><th>Category</th><th>Hours/week at 80% LTFT</th><th>Notes</th></tr></thead>
+        <tbody id="timeBudgetBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= REVIEW ================= -->
+  <section class="panel" id="panel-review">
+    <h2 class="section-title">Review worksheets</h2>
+    <p class="section-sub">Fill these in at your 6-month review. Everything here saves automatically to this device.</p>
+
+    <div class="grid cols-2" style="align-items:start;margin-bottom:30px;">
+      <div class="card">
+        <span class="eyebrow">Opportunity scorer</span>
+        <h3>Should I take this on?</h3>
+        <p style="margin-bottom:14px;">Score any opportunity 0–5 on each dimension before committing. ≥350/500 take it · 250–349 only if it replaces something · &lt;250 decline or defer.</p>
+        <input type="text" id="oppName" placeholder="Name this opportunity…" style="margin-bottom:14px;">
+        <div class="thesis-gate-box">
+          <label><input type="checkbox" id="thesisGate" checked> Does this genuinely strengthen the Thesis — not just "AI" or "cardiology" broadly?</label>
+          <div style="margin-top:4px;color:var(--ink-soft);font-size:11.5px;">Unchecked: still worth doing sometimes (rest, a favour to a mentor) — but it doesn't get to claim thesis-alignment points below.</div>
+        </div>
+        <div id="scoreDims"></div>
+        <div class="score-result" id="scoreResult">
+          <div class="verdict">Score an opportunity above</div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;">
+          <button class="btn" id="saveOppBtn">Save to log</button>
+          <span class="save-flash" id="oppFlash">saved</span>
+        </div>
+        <div id="oppLog" style="margin-top:16px;"></div>
+      </div>
+
+      <div class="card">
+        <span class="eyebrow">PHST self-assessment tracker</span>
+        <h3>Where you actually stand</h3>
+        <table class="styled" style="margin-top:8px;">
+          <thead><tr><th>Domain</th><th>Claim</th><th>Pts</th></tr></thead>
+          <tbody id="phstBody"></tbody>
+        </table>
+        <p style="margin-top:10px;font-size:12px;">Update this whenever a new achievement lands — remember only your single best claim counts per domain.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:30px;">
+      <span class="eyebrow">6-Month Review Dashboard</span>
+      <h3>Complete every six months</h3>
+      <div id="reviewForm"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;align-items:center;">
+        <button class="btn" id="saveReviewBtn">Save this review</button>
+        <span class="save-flash" id="reviewFlash">saved</span>
+      </div>
+      <div id="reviewHistory" style="margin-top:18px;"></div>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">"Not now" list</span>
+      <h3>Deliberately postponed</h3>
+      <div id="notNowList"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <input type="text" id="notNowInput" placeholder="Add something you're deliberately postponing…">
+        <button class="btn secondary" id="notNowAdd">Add</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">CAREER STRATEGY OPERATING PANEL · living document · review every six months · data stored locally to this device</div>
+</main>
+
+<script>
+/* ======================= DATA ======================= */
+const TODAY = new Date("2026-07-21");
+
+const GOALS = [
+  {t:"Clinical excellence", why:"The non-negotiable floor. No other pillar survives a clinical competence concern.", cap:"MRCP(UK) completion, sound acute medicine, LTFT-adjusted but not diluted competency sign-off.", success:"ARCP outcome 1 every year without exception; MRCP(UK) complete within IMT; zero remediation episodes.", risk:"LTFT can be wrongly read as reduced commitment; over-indexing on research at the expense of clinical logbook density.", time:"IMT1–3, Aug 2026 to ~2030."},
+  {t:"Procedural excellence — provisional lean: ablation/navigation", why:"The thesis needs real procedural credibility to be believed. EP is volume-dependent — compounds only if built early.", cap:"Device implantation competency, then ablation competency via EP-themed ST placements and a dedicated EP fellowship.", success:"Independent operator numbers meeting/exceeding national benchmarks by end of fellowship; a named signature interest connected to the thesis by year 12.", risk:"A research-heavy PhD block reducing procedural exposure; the provisional lean turning out wrong once real exposure begins (acceptable — that's what 'provisional' means).", time:"ST4–ST7 plus 1–2yr EP fellowship, ~2030–2039."},
+  {t:"Academic excellence, organised around the thesis", why:"Converts 'doctor with an AI interest' into the specific validation authority the thesis describes.", cap:"PhD/MD(Res) with a stated validation/implementation question, sustained authorship, grant-writing competence.", success:"3–4 thesis-coherent PhD papers; at least one genuinely technical co-authorship with a named computer scientist; PI/co-I role on a funded study by ST7.", risk:"PhD topic drift into generic AI-in-healthcare; taking a PhD for convenience rather than genuine thesis fit.", time:"ACF groundwork 2026–2030; PhD ~2031–2034, or earlier if a route allows."},
+  {t:"Artificial intelligence capability", why:"The thesis needs genuine technical fluency to be credible — not engineering-level depth.", cap:"Working fluency in ML concepts, regulatory pathways, critical model appraisal — capped deliberately below engineer-level.", success:"Named implementation/evaluation publications; a technical co-authored validation paper within 24 months.", risk:"Becoming the 'AI-interested doctor' without enough depth, or over-investing at the expense of procedural time.", time:"Foundational 2026–2027; applied/leadership 2027–2039."},
+  {t:"Medical device / innovation, via a funnel", why:"The highest-leverage domain, and the one most directly expressing the thesis in practice.", cap:"Device lifecycle understanding, IP basics, a biomedical engineering network — see the Innovation Funnel.", success:"By year 10: a device/software concept the thesis's methodology has been applied to, at funded prototype stage; a patent filing/disclosure by year 12; a formal industry advisory role by year 12–14.", risk:"Chasing a patent/startup before credibility exists; IP conflicts with NHS/university employer.", time:"Light-touch relationship-building from now; funnel gates from ~2031."},
+  {t:"Leadership", why:"Consultant/academic appointments increasingly require demonstrated leadership beyond output.", cap:"Formal training at the right stage, committee involvement, service improvement leadership.", success:"A completed, evaluated QI project with measurable impact; a national committee role by ST6–7; a departmental role by early consultant years.", risk:"Taking roles too early that consume time without CV return.", time:"ST4 onward, meaningful roles from ~2031."},
+  {t:"Teaching, pointed at the thesis", why:"Explicitly part of the vision, and a low-cost way to build visibility in parallel with everything else.", cap:"A portfolio of designed (not just delivered) teaching, with evaluated impact.", success:"Regular teaching with feedback data; national course faculty role by ST6–7; a teaching series specifically on AI-EP validation by year 8.", risk:"Teaching is most likely to go undocumented — log everything.", time:"Continuous, escalating responsibility."},
+  {t:"Relationship capital", why:"In a field this small, who knows the thesis matters as much as the work itself.", cap:"A structured tiered system, not passive conference attendance — see the Systems tab.", success:"A living relationship log reviewed monthly; at least one international collaboration connected to the thesis by ST6–7.", risk:"A Leicester-centric network given the guaranteed IMT-years constraint.", time:"Continuous from now."},
+  {t:"Financial independence, against an explicit number", why:"A genuine constraint on risk-taking — currently the goal most likely to stay vague unless forced to a number.", cap:"NHS pension/LTFT literacy, a written financial plan with an actual figure.", success:"The financial floor is written down and not breached without an explicit, logged, jointly-agreed exception.", risk:"Treating pay cuts as automatically acceptable without modelling cumulative LTFT-extended effect.", time:"Formal plan in the first 90 days; tracked every review."},
+  {t:"Personal wellbeing, protected by a mechanism", why:"Structurally the weakest goal — no external reward, so it loses any head-to-head fight unless it has real teeth.", cap:"The Energy Management System and a hard mechanism (partner veto, hard hours cap), not just a calendar reminder.", success:"At every review, at least one 350+ opportunity was still declined specifically to protect this goal, and logged — evidence the mechanism is binding.", risk:"Will lose by default unless the mechanism is genuinely followed, not just stated.", time:"Continuous, non-negotiable."}
+];
+
+const CAP_MATRIX = [
+  ["Clinical medicine (general)","2","4","5","ARCP + supervisor sign-off, not self-rating","Now–IMT3"],
+  ["Cardiology (general)","1","5","5","Consultant feedback each placement","ST4–ST7"],
+  ["Electrophysiology (specific)","1","5","5","EP fellowship director assessment, logbook audit","ST4–EP fellowship"],
+  ["Procedures (implant/ablation)","0","5","5","Independent operator numbers vs. benchmark","ST4–EP fellowship"],
+  ["AI implementation (healthcare)","3","5","4","Named co-author/supervisor review","Now–ST4"],
+  ["Machine learning / data science","2","3","3","Named CS collaborator assessment — deliberately capped","Now–ACF"],
+  ["Medical devices (regulatory/lifecycle)","1","3","3","Industry/regulatory mentor review","ST4–ST7"],
+  ["Clinical trials (design/delivery)","1","4","4","Statistician/methodologist co-review","PhD years, ST4–ST7"],
+  ["Grant writing","1","4","5","Track actual panel outcomes, not self-assessment","ACF/PhD years"],
+  ["Scientific writing","3","5","5","Editor/reviewer feedback on submissions","Continuous"],
+  ["Relationship capital","2","4","4","Relationship log review, monthly","Continuous"],
+  ["Leadership","2","4","4","360-style feedback from a committee/QI role","ST4 onward"]
+];
+
+const PROJECTS = [
+  {t:"MSc dissertation — ambient voice tech, AF virtual ward", tag:"Founding thesis data point", body:"Thesis link: the first proof the implementation-evaluation methodology works on a live cardiology pathway. Target: submit for publication within 6 months of dissertation submission — 'submitted' is the real milestone, not 'written'."},
+  {t:"IMT (80% LTFT, competency-based ARCP)", tag:"Floor", body:"Thesis link: the clinical-credibility floor the thesis depends on to be believed. MRCP(UK) Part 2 Written + PACES targeted within IMT. Preserve evidence for the PDSA-structured ECG audit."},
+  {t:"AI Implementation Team, Leicester", tag:"Institutional base", body:"Thesis link: most likely source of the 24-month technical co-authorship commitment, and the natural ACF Route A home. Push for a defined, named role beyond the MSc within 12 months."},
+  {t:"Scoping review — AI-enabled EP devices & registries", tag:"Founding thesis data point", body:"Thesis link: the device/registry landscape map the validation methodology will eventually be tested against. Register formally (PROSPERO/PRISMA-ScR), target submission 12–18 months from registration."}
+];
+
+const NINETY_DAY = [
+  {wk:"Weeks 1–2 — Foundations, including the new systems", items:[
+    "Make the Thesis paragraph genuinely yours, and diarise the first Five-Year Reset date now",
+    "Start the Decision Journal and idea log — a spreadsheet is enough",
+    "Draft the Family Operating Agreement as an explicit conversation, not an assumption — write the financial floor together in the same conversation",
+    "Formalise IMT educational supervisor as the Personal Board's Clinical chair",
+    "Send a first formal message to a Glenfield contact to fill the EP seat",
+    "Set up the Relationship Capital log with tiers, and audit last month's hours against the time budget"
+  ]},
+  {wk:"Weeks 3–6 — Convert projects to submission-track", items:[
+    "Set a hard, written submission deadline for the dissertation-derived paper",
+    "Finalise and formally register the scoping review protocol",
+    "Ask the AI Implementation Team lead for a defined, named 12-month role, and raise the technical co-authorship possibility",
+    "Draft a one-page professional summary stating the thesis explicitly",
+    "Identify one light-touch industry contact opportunity and take the first step"
+  ]},
+  {wk:"Weeks 7–10 — Build the academic pathway and cardio-coherence plan", items:[
+    "Have the explicit Route A vs Route B conversation with your Career Chair and log the decision, and the parallel-hedge plan",
+    "If Route A: check Oriel for an ST1/CT1-linked ACF route at Leicester sooner than the ST4-linked cycle",
+    "Consolidate evidence files now for every ceiling-scoring PHST domain",
+    "Identify an academic supervisor within the AI Implementation Team network for the Board's Academic seat",
+    "Draft rehearsed 'bridge' narratives for the non-cardiac achievements",
+    "Book study leave for the first cardiology-specific course, and scope a cardiology audit + teaching opportunity pointed at the ablation/navigation lean",
+    "Score any open opportunity using the full framework, including the thesis gate"
+  ]},
+  {wk:"Weeks 11–13 — Consolidate and start the operating rhythm", items:[
+    "Complete a first informal draft of the 6-month review dashboard as a baseline",
+    "Run the first weekly and monthly review cycles for real, to catch friction before relying on them for 15 years",
+    "Audit whether the 80% LTFT non-working time is genuinely protected in practice",
+    "Revisit the Not Now list and confirm nothing has been informally started",
+    "Hold the first Family Operating Agreement check-in specifically, separate from a general catch-up"
+  ]}
+];
+
+const PHST = [
+  ["MRCP(UK)","Part 1 passed; Part 2 Written + PACES targeted","8/8*"],
+  ["Postgraduate degree","MSc, standalone, 8mo+","3/4"],
+  ["Publications","First author, PubMed-cited (NPJ PC&RM)","8/8"],
+  ["Presentations","Oral, international, first author","6/6"],
+  ["Additional achievements","Top-tier prize/honours","≤3/3"],
+  ["Quality improvement","ECG audit, PDSA, 2 cycles, led","4/4"],
+  ["Teaching experience","3-month programme, documented feedback","5/5"],
+  ["Training in teaching","Teach the Teacher (live, 6hr+)","1/3"],
+  ["Leadership & management","National charity ambassadorship, 6mo+","4/4"]
+];
+
+const REVIEW_KPIS = [
+  ["Clinical training progress","ARCP outcome 1 / on-track"],
+  ["MRCP(UK) / exam progress","On schedule"],
+  ["Papers submitted","≥1 / 6 months"],
+  ["Papers published (cumulative)","Track count"],
+  ["Thesis coherence check","Would a stranger's CV read guess these all belong to one thesis?"],
+  ["Conference presentations (cumulative)","≥1 / year"],
+  ["Grant/fellowship applications submitted","Per Academic Strategy timeline"],
+  ["Technical co-authorship progress","On track for the 24-month commitment"],
+  ["New Tier 1/2 relationships logged","≥5 / 6 months"],
+  ["Personal Board seat meetings held","Per cadence"],
+  ["Teaching sessions delivered","≥2 / 6 months"],
+  ["Innovation Funnel gate progress","Per funnel stage"],
+  ["Time-budget cap respected","Yes/No"],
+  ["Family Operating Agreement check-in completed","Yes/No"],
+  ["Financial floor maintained","Yes/No"],
+  ["Overall: still disciplined by the thesis, or has dilution crept back in?","Be honest — the single most important line"]
+];
+
+const SCORE_DIMS = [
+  ["Thesis alignment",20],["Procedural/clinical skill",15],["Research output",15],
+  ["AI/innovation relevance",10],["Relationship value",15],["Teaching/leadership value",10],
+  ["Enjoyment/sustainability",10],["Opportunity cost (penalty)",5]
+];
+
+const TL_COLORS = {"Clinical training":"#17263D","Exams":"#2E5C8A","Research output":"#2F9E64","Academic pathway":"#B8862E","Cardio-coherence":"#C2622E","Study leave":"#6B4FA0"};
+
+const TL_NEAR = [
+  ["MRCP(UK) Part 2 Written","2026-08-01","2027-02-01","Exams"],
+  ["MRCP(UK) PACES","2027-02-01","2027-09-01","Exams"],
+  ["MSc dissertation → publication","2026-07-21","2027-01-31","Research output"],
+  ["Scoping review: protocol","2026-08-01","2026-10-01","Research output"],
+  ["Scoping review: conduct & write-up","2026-10-01","2027-10-01","Research output"],
+  ["Scoping review: submission/pub.","2027-10-01","2028-04-01","Research output"],
+  ["Cardiology audit (new, during placement)","2027-09-01","2028-03-01","Cardio-coherence"],
+  ["Cardiology case report / publication","2028-01-01","2028-07-01","Cardio-coherence"],
+  ["Cardiology presentation (local/regional)","2027-11-01","2028-03-01","Cardio-coherence"],
+  ["Cardiology-themed teaching series","2027-09-01","2028-03-01","Cardio-coherence"],
+  ["ECG interpretation course","2026-11-01","2026-11-01","Study leave"],
+  ["BSE introductory echo module","2027-05-01","2027-05-01","Study leave"],
+  ["BCS annual conference","2027-06-01","2027-06-01","Study leave"],
+  ["ALS renewal","2029-03-01","2029-03-01","Study leave"],
+  ["Evidence portfolio consolidation","2026-08-01","2026-11-01","Academic pathway"],
+  ["AI Implementation Team — named role","2026-09-01","2029-12-01","Academic pathway"],
+  ["Route A/B decision: ACF (Leicester) vs. direct PhD","2026-09-01","2026-11-01","Academic pathway"],
+  ["ACF application window (Leicester, if Route A)","2026-10-01","2027-01-31","Academic pathway"],
+  ["IMT1 (80% LTFT)","2026-08-01","2027-08-01","Clinical training"],
+  ["IMT2 (80% LTFT)","2027-08-01","2028-08-01","Clinical training"],
+  ["IMT3 (80% LTFT)","2028-08-01","2029-12-01","Clinical training"],
+  ["PhD / Doctoral Fellowship application","2028-10-01","2029-06-01","Academic pathway"],
+  ["Cardiology ST4 national application","2029-10-01","2030-03-01","Academic pathway"],
+];
+const TL_NEAR_MILESTONE = ["ST4 entry (cardiology)","2030-08-01"];
+const TL_NEAR_RANGE = ["2026-07-01","2030-12-01"];
+
+const TL_STRAT = [
+  ["IMT1–IMT3 (core training)","2026-08-01","2030-08-01","Clinical training"],
+  ["ACF / academic groundwork","2026-08-01","2030-08-01","Academic pathway"],
+  ["ST4 (clinical year before OOP)","2030-08-01","2031-08-01","Clinical training"],
+  ["PhD / MD(Res) (OOP)","2031-08-01","2034-08-01","Research output"],
+  ["ST5–ST7 (EP-themed)","2034-08-01","2037-08-01","Clinical training"],
+  ["EP Fellowship","2037-08-01","2039-08-01","Clinical training"],
+  ["Consultant post & job plan","2039-08-01","2041-08-01","Clinical training"],
+  ["Academic title (Senior Lecturer)","2039-08-01","2041-08-01","Academic pathway"],
+  ["First grant as PI","2040-01-01","2041-08-01","Research output"],
+];
+const TL_STRAT_MILESTONE = [["ST4 entry (cardiology)","2030-08-01"],["Five-Year Reset 1","2031-08-01"],["Five-Year Reset 2","2036-08-01"],["CCT / Consultant","2039-08-01"]];
+const TL_STRAT_RANGE = ["2026-07-01","2042-01-01"];
+
+const NOT_NOW_DEFAULT = [
+  {text:"Starting a company/startup around an AI or device idea", review:"Reconsider ~2034 onward — the Innovation Funnel's later gates decide readiness, not enthusiasm"},
+  {text:"A second unrelated postgraduate qualification (MBA, further data-science MSc)", review:"Only if a named future role explicitly requires it"},
+  {text:"A national committee/society leadership role before ST4", review:"Reconsider from ST4 onward"},
+  {text:"Deep production-level software engineering skill beyond the AI Strategy target", review:"Only if a specific informatics-leadership role requires it — competes directly with procedural time"},
+  {text:"Committing to a specific EP fellowship location", review:"Reconsider from ST4/5, once the ablation/navigation lean has been tested, jointly with the Family Operating Agreement"},
+  {text:"Formal industry advisory/consultancy agreements (distinct from light-touch contact already begun)", review:"Reconsider from ST6/consultant years"},
+  {text:"A third major concurrent research project", review:"Hold until dissertation + scoping review are submitted"},
+  {text:"Any premature bet on a single specific technology or device platform", review:"Reconsider once the Research Pipeline has produced at least two thesis-coherent outputs"}
+];
+
+const BOARD_SEATS = [
+  {seat:"Clinical chair", mandate:"ARCP guidance, references, sanity-check on clinical time vs. thesis ambition", cadence:"Termly", source:"Current IMT educational supervisor"},
+  {seat:"EP seat", mandate:"Procedural role-modelling, EP fellowship advice", cadence:"6-monthly", source:"Existing Glenfield contacts"},
+  {seat:"Academic/PhD supervisor seat", mandate:"Grant strategy, PhD topic pointed at the thesis, ACF/NIHR review", cadence:"6-monthly in windows, else termly", source:"Leicester AI Implementation Team network"},
+  {seat:"Statistician seat", mandate:"Named co-investigator for PhD and beyond", cadence:"Annually, or as needed", source:"University medical statistics dept."},
+  {seat:"Computer scientist / ML seat", mandate:"Technical partner; co-author on the technical validation paper", cadence:"6-monthly, more when active", source:"AI Implementation Team technical staff"},
+  {seat:"Biomedical engineer seat", mandate:"Essential for the Innovation Funnel; translates clinical need to spec", cadence:"Annually until active", source:"University biomedical engineering dept."},
+  {seat:"Industry seat", mandate:"Realistic device/regulatory pathway view, honest timeline calibration", cadence:"Annually, light-touch from now", source:"Built from now via light-touch contact"},
+  {seat:"Career chair", mandate:"Big-picture challenge; explicitly asked whether the plan looks disciplined or has drifted", cadence:"Annually + every Five-Year Reset", source:"A senior clinical academic with a genuinely balanced career"}
+];
+
+const CADENCE_ITEMS = [
+  {freq:"Weekly", items:["Check Research Pipeline / Innovation Funnel for anything stuck","Log any opportunity scored this week","One line in the Decision Journal if a real decision was made","One line in the Energy log"]},
+  {freq:"Monthly", items:["Capability Matrix nudge — has anything genuinely moved, verified not self-rated","Relationship Capital review — Tier 1 follow-ups due","Research Pipeline glance — anything stuck too long in one stage"]},
+  {freq:"Quarterly", items:["Full Opportunity Log review against the scoring weights","Financial floor check","Energy log review for depletion-without-restoration patterns","Public brand output check — has the quarterly piece happened"]},
+];
+
+const PIPELINE_STAGES = ["Raw idea","Protocol/design","Data collection","Analysis/write-up","Submission","Published"];
+const PIPELINE_DEFAULT = [
+  {text:"MSc dissertation — AF virtual ward ambient AI", stage:"Analysis/write-up"},
+  {text:"Scoping review — AI-EP devices & registries", stage:"Data collection"},
+  {text:"Technical validation paper (named CS co-author)", stage:"Raw idea"},
+];
+
+const TIME_BUDGET = [
+  ["Direct clinical (rostered)","~30","80% of a standard full-time week; varies by rotation/on-call"],
+  ["Clinical admin / non-rostered","~4–6","Frequently under-counted — audit explicitly in the first 90 days"],
+  ["Protected academic/research time","~6–8","The non-working LTFT fraction — genuinely protected only if defended"],
+  ["Relationship capital / networking","~1–2","Tier 1 follow-ups, log maintenance"],
+  ["Public brand / writing","~1 (avg, lumpy)","Quarterly output, not a steady weekly load"],
+  ["Family / partner time","Explicit floor, Family Operating Agreement","Not a residual — a fixed allocation, not whatever's left over"],
+  ["Sleep, exercise, personal","Explicit floor, non-negotiable","Protected by the hard mechanism in Lifestyle & Energy Management"],
+];
+
+/* ======================= STORAGE (with in-memory fallback) ======================= */
+const memStore = {};
+const LS_PREFIX = 'csapp_';
+async function saveData(key, value){
+  try{ localStorage.setItem(LS_PREFIX+key, JSON.stringify(value)); return; }catch(e){}
+  try{ if(window.storage){ await window.storage.set(key, JSON.stringify(value), false); return; } }catch(e){}
+  memStore[key] = JSON.stringify(value);
+}
+async function loadData(key, fallback){
+  try{
+    const raw = localStorage.getItem(LS_PREFIX+key);
+    if(raw !== null) return JSON.parse(raw);
+  }catch(e){}
+  try{
+    if(window.storage){
+      const r = await window.storage.get(key, false);
+      if(r) return JSON.parse(r.value);
+    }
+  }catch(e){}
+  return memStore[key] ? JSON.parse(memStore[key]) : fallback;
+}
+function flash(id){ const el=document.getElementById(id); el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1400); }
+
+/* ======================= TABS ======================= */
+document.getElementById('tabNav').addEventListener('click', e=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+});
+
+/* ======================= TOP STATS ======================= */
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function renderTopStats(){
+  const st4 = new Date("2030-08-01");
+  const daysToST4 = daysBetween(TODAY, st4);
+  const ltftStart = new Date("2026-08-01");
+  const wk = Math.max(0, Math.floor(daysBetween(ltftStart,TODAY)/7));
+  document.getElementById('topStats').innerHTML = `
+    <div class="stat"><span class="num">80%</span><span class="lbl">LTFT fraction</span></div>
+    <div class="stat"><span class="num">Wk ${wk}</span><span class="lbl">of IMT1</span></div>
+    <div class="stat"><span class="num">${daysToST4}d</span><span class="lbl">to ST4 entry (est.)</span></div>
+  `;
+}
+
+/* ======================= GOALS ======================= */
+function renderGoals(){
+  document.getElementById('goalsList').innerHTML = GOALS.map(g=>`
+    <details class="goal">
+      <summary>${g.t} <span class="arrow">›</span></summary>
+      <div class="goal-body">
+        <div><b>Why it matters —</b> ${g.why}</div>
+        <div><b>Capabilities required —</b> ${g.cap}</div>
+        <div><b>Definition of success —</b> ${g.success}</div>
+        <div><b>Risks —</b> ${g.risk}</div>
+        <div><b>Timeframe —</b> <span class="pill rhythm">${g.time}</span></div>
+      </div>
+    </details>
+  `).join('');
+}
+
+/* ======================= CAP MATRIX ======================= */
+function renderCapMatrix(){
+  document.getElementById('capMatrixBody').innerHTML = CAP_MATRIX.map(r=>`
+    <tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td style="font-size:11.5px;">${r[4]}</td><td>${r[5]}</td></tr>
+  `).join('');
+}
+
+/* ======================= PROJECTS ======================= */
+function renderProjects(){
+  document.getElementById('projectsGrid').innerHTML = PROJECTS.map(p=>`
+    <div class="card">
+      <span class="pill ${p.tag==='Founding thesis data point'?'rose':'rhythm'}">${p.tag}</span>
+      <h3 style="margin-top:8px;">${p.t}</h3>
+      <p>${p.body}</p>
+    </div>
+  `).join('');
+}
+
+/* ======================= 90-DAY CHECKLIST ======================= */
+async function renderNinetyDay(){
+  const state = await loadData('ninety-day-state', {});
+  const container = document.getElementById('ninetyDayContainer');
+  container.innerHTML = NINETY_DAY.map((wk,wi)=>`
+    <div class="week-block">
+      <h4>${wk.wk}</h4>
+      <ul class="checklist">
+        ${wk.items.map((it,ii)=>{
+          const id = 'nd-'+wi+'-'+ii;
+          const done = !!state[id];
+          return `<li class="${done?'done':''}">
+            <input type="checkbox" id="${id}" ${done?'checked':''}>
+            <label for="${id}">${it}</label>
+          </li>`;
+        }).join('')}
+      </ul>
+    </div>
+  `).join('');
+  container.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', async ()=>{
+      const st = await loadData('ninety-day-state', {});
+      st[cb.id] = cb.checked;
+      cb.closest('li').classList.toggle('done', cb.checked);
+      await saveData('ninety-day-state', st);
+      flash('ninetyFlash');
+    });
+  });
+}
+
+/* ======================= PHST TABLE ======================= */
+function renderPHST(){
+  document.getElementById('phstBody').innerHTML = PHST.map(r=>`
+    <tr><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td></tr>
+  `).join('') + `<tr><td colspan="3" style="font-size:11px;color:var(--ink-soft);">*once both MRCP components complete. Individual specialty forms may select a subset of these domains — confirm against the live cardiology self-assessment each cycle.</td></tr>`;
+}
+
+/* ======================= TIMELINE RENDERER ======================= */
+function parseDate(s){ return new Date(s); }
+function pct(d, start, end){ return (d-start)/(end-start)*100; }
+
+function renderTimeline(containerId, legendId, tasks, milestones, range){
+  const start = parseDate(range[0]), end = parseDate(range[1]);
+  const cont = document.getElementById(containerId);
+  const milestoneList = milestones ? (Array.isArray(milestones[0]) ? milestones : [milestones]) : [];
+  let axisYears = [];
+  let cy = start.getFullYear();
+  while(cy <= end.getFullYear()){ axisYears.push(cy); cy++; }
+
+  let html = `<div class="tl-axis">`;
+  axisYears.forEach(y=>{
+    const d = new Date(y+"-01-01");
+    if(d>=start && d<=end){
+      html += `<span style="left:${pct(d,start,end)}%">${y}</span>`;
+    }
+  });
+  html += `</div>`;
+
+  tasks.forEach(([name,s,e,cat])=>{
+    const sd = parseDate(s), ed = parseDate(e);
+    const left = pct(sd,start,end), width = pct(ed,start,end)-pct(sd,start,end);
+    html += `<div class="tl-row">
+      <div class="tl-label">${name}</div>
+      <div class="tl-track">
+        <div class="tl-bar" style="left:${left}%;width:${Math.max(width,0.6)}%;background:${TL_COLORS[cat]};" title="${name}"></div>
+      </div>
+    </div>`;
+  });
+
+  milestoneList.forEach(milestone=>{
+    const md = parseDate(milestone[1]);
+    const mpct = pct(md,start,end);
+    html += `<div class="tl-row" style="margin-top:4px;">
+      <div class="tl-label" style="font-weight:600;color:var(--rose);">${milestone[0]}</div>
+      <div class="tl-track"><div class="tl-milestone" style="left:${mpct}%;"></div></div>
+    </div>`;
+  });
+
+  const todayPct = pct(TODAY,start,end);
+
+  cont.innerHTML = `<div style="position:relative;">${html}
+    <div class="tl-today" style="left:calc(230px + (100% - 230px) * ${todayPct/100}); position:absolute; top:0; bottom:0;">
+      <div class="tl-today-label">Today</div>
+    </div>
+  </div>`;
+
+  const usedCats = new Set(tasks.map(t=>t[3]));
+  document.getElementById(legendId).innerHTML = Object.entries(TL_COLORS).filter(([k])=>usedCats.has(k)).map(([k,c])=>
+    `<span><i style="background:${c}"></i>${k}</span>`
+  ).join('') + (milestoneList.length ? `<span><i style="background:var(--rose);transform:rotate(45deg);"></i>Milestone</span>` : '');
+}
+
+/* ======================= OPPORTUNITY SCORER ======================= */
+let scoreState = {};
+function renderScoreDims(){
+  document.getElementById('scoreDims').innerHTML = SCORE_DIMS.map(([name,weight],i)=>{
+    scoreState[i] = scoreState[i] ?? 0;
+    return `<div class="score-dim">
+      <div class="dname">${name} <span style="color:var(--ink-soft);font-family:var(--mono);font-size:10.5px;">(w${weight})</span></div>
+      <input type="range" min="0" max="5" step="1" value="${scoreState[i]}" data-i="${i}" class="scoreSlider">
+      <div class="dval" id="sv-${i}">${scoreState[i]}</div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.scoreSlider').forEach(sl=>{
+    sl.addEventListener('input', ()=>{
+      scoreState[sl.dataset.i] = Number(sl.value);
+      document.getElementById('sv-'+sl.dataset.i).textContent = sl.value;
+      computeScore();
+    });
+  });
+  computeScore();
+}
+function computeScore(){
+  const gateOpen = document.getElementById('thesisGate') ? document.getElementById('thesisGate').checked : true;
+  let total = 0, penalty = 0;
+  SCORE_DIMS.forEach(([name,weight],i)=>{
+    let v = scoreState[i]||0;
+    if(name === 'Thesis alignment' && !gateOpen) v = 0;
+    if(name.includes('penalty')) penalty += v*weight;
+    else total += v*weight;
+  });
+  const net = total - penalty;
+  const max = 475; // sum of non-penalty weights * 5
+  const resultEl = document.getElementById('scoreResult');
+  let cls='decline', verdict='Decline or defer to Not-Now';
+  if(net>=350){cls='take'; verdict='Take it — restructure lower-scoring commitments to make room';}
+  else if(net>=250){cls='conditional'; verdict='Take it only if it replaces something else on your plate';}
+  if(!gateOpen){ verdict += ' (thesis gate closed — capped)'; }
+  resultEl.className = 'score-result '+cls;
+  resultEl.innerHTML = `<div class="verdict">${verdict}</div><div class="score-total">${net}<span style="font-size:14px;color:var(--ink-soft);">/${max}</span></div>`;
+}
+document.getElementById('thesisGate').addEventListener('change', computeScore);
+document.getElementById('saveOppBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('oppName').value.trim() || 'Untitled opportunity';
+  const gateOpen = document.getElementById('thesisGate').checked;
+  let total=0; SCORE_DIMS.forEach(([n,w],i)=>{ if(!n.includes('penalty')){ let v=scoreState[i]||0; if(n==='Thesis alignment' && !gateOpen) v=0; total += v*w; } });
+  SCORE_DIMS.forEach(([n,w],i)=>{ if(n.includes('penalty')) total -= (scoreState[i]||0)*w; });
+  const log = await loadData('opportunity-log', []);
+  log.unshift({name, score: total, date: new Date().toISOString().slice(0,10), gate: gateOpen});
+  await saveData('opportunity-log', log.slice(0,25));
+  document.getElementById('oppName').value='';
+  flash('oppFlash');
+  renderOppLog();
+});
+async function renderOppLog(){
+  const log = await loadData('opportunity-log', []);
+  if(!log.length){ document.getElementById('oppLog').innerHTML=''; return; }
+  document.getElementById('oppLog').innerHTML = `<span class="eyebrow">Recent log</span>` + log.map(o=>
+    `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--line);">
+      <span>${o.name}</span><span style="font-family:var(--mono);color:${o.score>=350?'var(--rhythm)':o.score>=250?'var(--gold)':'var(--rose)'}">${o.score} · ${o.date}</span>
+    </div>`).join('');
+}
+
+/* ======================= REVIEW DASHBOARD ======================= */
+async function renderReviewForm(){
+  const latest = await loadData('review-latest', {});
+  document.getElementById('reviewForm').innerHTML = REVIEW_KPIS.map(([name,target],i)=>`
+    <div class="kpi-row">
+      <div class="kpi-name">${name}</div>
+      <div class="kpi-target">${target}</div>
+      <input type="text" data-kpi="${i}" placeholder="Result / comment…" value="${(latest[i]||'').replace(/"/g,'&quot;')}">
+    </div>
+  `).join('');
+  renderReviewHistory();
+}
+document.getElementById('saveReviewBtn').addEventListener('click', async ()=>{
+  const inputs = document.querySelectorAll('#reviewForm input[data-kpi]');
+  const snapshot = {};
+  inputs.forEach(inp=>snapshot[inp.dataset.kpi]=inp.value);
+  await saveData('review-latest', snapshot);
+  const history = await loadData('review-history', []);
+  history.unshift({date:new Date().toISOString().slice(0,10), snapshot});
+  await saveData('review-history', history.slice(0,20));
+  flash('reviewFlash');
+  renderReviewHistory();
+});
+async function renderReviewHistory(){
+  const history = await loadData('review-history', []);
+  if(!history.length){ document.getElementById('reviewHistory').innerHTML=''; return; }
+  document.getElementById('reviewHistory').innerHTML = `<span class="eyebrow">Review history</span>` +
+    history.map(h=>`<div style="font-size:12px;color:var(--ink-soft);padding:4px 0;font-family:var(--mono);">${h.date} — saved</div>`).join('');
+}
+
+/* ======================= NOT NOW LIST ======================= */
+async function renderNotNow(){
+  let items = await loadData('not-now-list', null);
+  if(!items){ items = NOT_NOW_DEFAULT; await saveData('not-now-list', items); }
+  document.getElementById('notNowList').innerHTML = items.map((it,i)=>`
+    <div class="notnow-item">
+      <div><div class="nn-text">${it.text}</div><div class="nn-review">${it.review}</div></div>
+      <button class="btn secondary" data-remove="${i}" style="padding:5px 10px;font-size:11px;">Remove</button>
+    </div>
+  `).join('');
+  document.querySelectorAll('[data-remove]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      let items = await loadData('not-now-list', NOT_NOW_DEFAULT);
+      items.splice(Number(b.dataset.remove),1);
+      await saveData('not-now-list', items);
+      renderNotNow();
+    });
+  });
+}
+document.getElementById('notNowAdd').addEventListener('click', async ()=>{
+  const val = document.getElementById('notNowInput').value.trim();
+  if(!val) return;
+  let items = await loadData('not-now-list', NOT_NOW_DEFAULT);
+  items.push({text:val, review:'Added '+new Date().toISOString().slice(0,10)});
+  await saveData('not-now-list', items);
+  document.getElementById('notNowInput').value='';
+  renderNotNow();
+});
+
+/* ======================= SYSTEMS TAB ======================= */
+
+function renderBoard(){
+  document.getElementById('boardList').innerHTML = BOARD_SEATS.map(b=>`
+    <div class="board-seat">
+      <span class="seat-name">${b.seat}</span><span class="seat-meta">${b.cadence}</span>
+      <div style="color:var(--ink-soft);margin-top:2px;">${b.mandate}</div>
+      <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:2px;">via ${b.source}</div>
+    </div>
+  `).join('');
+}
+
+async function renderCadence(){
+  const state = await loadData('cadence-state', {});
+  document.getElementById('cadenceChecklist').innerHTML = CADENCE_ITEMS.map((block,bi)=>`
+    <div style="margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--rhythm);margin-bottom:4px;">${block.freq}</div>
+      ${block.items.map((it,ii)=>{
+        const id = 'cad-'+bi+'-'+ii;
+        const checked = !!state[id];
+        return `<div class="cadence-check"><input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${it}</label></div>`;
+      }).join('')}
+    </div>
+  `).join('');
+  document.querySelectorAll('.cadence-check input').forEach(cb=>{
+    cb.addEventListener('change', async ()=>{
+      const st = await loadData('cadence-state', {});
+      st[cb.id] = cb.checked;
+      await saveData('cadence-state', st);
+    });
+  });
+}
+
+async function renderContacts(){
+  const contacts = await loadData('relationship-contacts', []);
+  const now = TODAY;
+  const cadenceDays = {1:35, 2:100, 3:380};
+  document.getElementById('contactRows').innerHTML = contacts.map((c,i)=>{
+    const last = c.date ? new Date(c.date) : null;
+    const overdue = last ? (Math.round((now-last)/86400000) > cadenceDays[c.tier]) : true;
+    return `<div class="contact-row">
+      <div><b>${c.name}</b><div style="font-size:11px;color:var(--ink-soft);">${c.note||''}</div></div>
+      <div><span class="tier-badge ${overdue?'overdue':'t'+c.tier}">${overdue?'Overdue':'Tier '+c.tier}</span></div>
+      <div style="font-family:var(--mono);font-size:11px;">${c.date||'—'}</div>
+      <div></div>
+      <button class="btn secondary" data-rmcontact="${i}" style="padding:4px 9px;font-size:10.5px;">Remove</button>
+    </div>`;
+  }).join('') || `<p style="color:var(--ink-soft);font-size:12.5px;">No contacts logged yet — add your first below.</p>`;
+  document.querySelectorAll('[data-rmcontact]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const contacts = await loadData('relationship-contacts', []);
+      contacts.splice(Number(b.dataset.rmcontact),1);
+      await saveData('relationship-contacts', contacts);
+      renderContacts();
+    });
+  });
+}
+document.getElementById('contactAdd').addEventListener('click', async ()=>{
+  const name = document.getElementById('contactName').value.trim();
+  if(!name) return;
+  const tier = Number(document.getElementById('contactTier').value);
+  const note = document.getElementById('contactNote').value.trim();
+  const date = document.getElementById('contactDate').value.trim();
+  const contacts = await loadData('relationship-contacts', []);
+  contacts.unshift({name, tier, note, date});
+  await saveData('relationship-contacts', contacts);
+  ['contactName','contactNote','contactDate'].forEach(id=>document.getElementById(id).value='');
+  renderContacts();
+});
+
+async function renderPipeline(){
+  const items = await loadData('research-pipeline', PIPELINE_DEFAULT);
+  document.getElementById('pipelineKanban').innerHTML = PIPELINE_STAGES.map(stage=>`
+    <div class="kanban-col">
+      <h5>${stage}</h5>
+      ${items.filter(it=>it.stage===stage).map((it)=>{
+        const idx = items.indexOf(it);
+        return `<div class="kanban-card">${it.text}
+          <select data-pidx="${idx}">${PIPELINE_STAGES.map(s=>`<option value="${s}" ${s===stage?'selected':''}>${s}</option>`).join('')}</select>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+  document.querySelectorAll('[data-pidx]').forEach(sel=>{
+    sel.addEventListener('change', async ()=>{
+      const items = await loadData('research-pipeline', PIPELINE_DEFAULT);
+      items[Number(sel.dataset.pidx)].stage = sel.value;
+      await saveData('research-pipeline', items);
+      renderPipeline();
+    });
+  });
+}
+document.getElementById('pipelineAdd').addEventListener('click', async ()=>{
+  const val = document.getElementById('pipelineInput').value.trim();
+  if(!val) return;
+  const items = await loadData('research-pipeline', PIPELINE_DEFAULT);
+  items.push({text:val, stage:"Raw idea"});
+  await saveData('research-pipeline', items);
+  document.getElementById('pipelineInput').value='';
+  renderPipeline();
+});
+
+async function renderJournal(){
+  const entries = await loadData('decision-journal', []);
+  document.getElementById('journalList').innerHTML = entries.map(e=>`
+    <div class="journal-entry"><div class="je-date">${e.date}</div><div class="je-text"><b>${e.decision}</b><br>${e.reasoning}</div></div>
+  `).join('');
+}
+document.getElementById('journalAdd').addEventListener('click', async ()=>{
+  const decision = document.getElementById('journalDecision').value.trim();
+  const reasoning = document.getElementById('journalReasoning').value.trim();
+  if(!decision) return;
+  const entries = await loadData('decision-journal', []);
+  entries.unshift({decision, reasoning, date:new Date().toISOString().slice(0,10)});
+  await saveData('decision-journal', entries.slice(0,50));
+  document.getElementById('journalDecision').value='';
+  document.getElementById('journalReasoning').value='';
+  flash('journalFlash');
+  renderJournal();
+});
+
+async function renderEnergy(){
+  const entries = await loadData('energy-log', []);
+  document.getElementById('energyList').innerHTML = entries.map(e=>`
+    <div class="journal-entry"><div class="je-date">${e.date} · thesis-aligned: ${e.thesis}</div><div class="je-text">Depleted: ${e.depleted}<br>Restored: ${e.restored}</div></div>
+  `).join('');
+}
+document.getElementById('energyAdd').addEventListener('click', async ()=>{
+  const depleted = document.getElementById('energyDepleted').value.trim();
+  const thesis = document.getElementById('energyThesis').value.trim();
+  const restored = document.getElementById('energyRestored').value.trim();
+  if(!depleted && !restored) return;
+  const entries = await loadData('energy-log', []);
+  entries.unshift({depleted, thesis, restored, date:new Date().toISOString().slice(0,10)});
+  await saveData('energy-log', entries.slice(0,50));
+  ['energyDepleted','energyThesis','energyRestored'].forEach(id=>document.getElementById(id).value='');
+  flash('energyFlash');
+  renderEnergy();
+});
+
+async function renderFOA(){
+  const data = await loadData('family-operating-agreement', {});
+  const fields = {foaGeo:'geo', foaChildren:'children', foaPartner:'partner', foaTriggers:'triggers'};
+  Object.entries(fields).forEach(([id,key])=>{
+    document.getElementById(id).value = data[key] || '';
+    document.getElementById(id).addEventListener('blur', async ()=>{
+      const d = await loadData('family-operating-agreement', {});
+      d[key] = document.getElementById(id).value;
+      await saveData('family-operating-agreement', d);
+    });
+  });
+}
+
+function renderTimeBudget(){
+  document.getElementById('timeBudgetBody').innerHTML = TIME_BUDGET.map(r=>`
+    <tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td style="font-size:12px;">${r[2]}</td></tr>
+  `).join('');
+}
+
+/* ======================= PROGRESS TAB ======================= */
+
+const PROGRESS_GROUPS = [
+  {name:"Cardiology Portfolio (PHST Rubric)", blocks:[
+    {s:"MRCP W", f:"MRCP Part 2 Written"},
+    {s:"PACES", f:"PACES"},
+    {s:"MSc", f:"Postgraduate degree (MSc)"},
+    {s:"Pubs", f:"Publications (first-author)"},
+    {s:"Pres.", f:"Presentations (international)"},
+    {s:"Extra achv.", f:"Additional achievements"},
+    {s:"QI/Audit", f:"Quality improvement (audit)"},
+    {s:"Teaching", f:"Teaching experience"},
+    {s:"Teach trg.", f:"Training in teaching"},
+    {s:"Leadership", f:"Leadership & management"}
+  ]},
+  {name:"AI & Thesis Research", blocks:[
+    {s:"MSc diss.", f:"MSc dissertation submitted"},
+    {s:"SR protocol", f:"Scoping review protocol registered"},
+    {s:"SR data", f:"Scoping review data collection"},
+    {s:"SR submit", f:"Scoping review submitted"},
+    {s:"Tech co-auth.", f:"Technical co-authorship (24mo)"},
+    {s:"PhD funded", f:"PhD funding secured"}
+  ]},
+  {name:"Clinical Training (IMT)", blocks:[
+    {s:"IMT1", f:"IMT1 complete"},
+    {s:"IMT2", f:"IMT2 complete"},
+    {s:"IMT3", f:"IMT3 complete"},
+    {s:"MRCP W", f:"MRCP Part 2 Written"},
+    {s:"PACES", f:"PACES"}
+  ]},
+  {name:"Cardio-Coherence Deliverables", blocks:[
+    {s:"Audit", f:"Cardiology audit"},
+    {s:"Pub.", f:"Cardiology publication"},
+    {s:"Pres.", f:"Cardiology presentation"},
+    {s:"Teaching", f:"Cardiology teaching series"},
+    {s:"ECG crs.", f:"ECG course"},
+    {s:"Echo crs.", f:"Echo course"}
+  ]},
+  {name:"ACF / PhD Pathway", blocks:[
+    {s:"Route A/B", f:"Route A/B decision made"},
+    {s:"ACF applied", f:"ACF application submitted"},
+    {s:"PhD applied", f:"PhD application submitted"}
+  ]}
+];
+
+async function renderProgressGroups(){
+  const state = await loadData('progress-blocks', {});
+  document.getElementById('progressGroups').innerHTML = PROGRESS_GROUPS.map((g,gi)=>{
+    const doneCount = g.blocks.filter((b,bi)=>state[gi+'-'+bi]).length;
+    return `<div class="segbar-group">
+      <div class="segbar-head"><h3>${g.name}</h3><span class="segbar-frac">${doneCount}/${g.blocks.length}</span></div>
+      <div class="segbar-track">
+        ${g.blocks.map((b,bi)=>`<div class="segbar-block ${state[gi+'-'+bi]?'done':''}" data-g="${gi}" data-b="${bi}" title="${b.f}"></div>`).join('')}
+      </div>
+      <div class="segbar-labels">${g.blocks.map(b=>`<span title="${b.f}">${b.s}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.segbar-block').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      const key = el.dataset.g+'-'+el.dataset.b;
+      const state = await loadData('progress-blocks', {});
+      state[key] = !state[key];
+      await saveData('progress-blocks', state);
+      renderProgressGroups();
+    });
+  });
+}
+
+async function renderTasks(){
+  const tasks = await loadData('workload-tasks', []);
+  const capacity = Number((await loadData('workload-capacity', 10)));
+  document.getElementById('capacitySetting').value = capacity;
+  const activeHours = tasks.filter(t=>!t.done).reduce((s,t)=>s+Number(t.hours||0),0);
+  const pct = capacity>0 ? Math.min((activeHours/capacity)*100, 999) : 0;
+  const fill = document.getElementById('capacityFill');
+  fill.style.width = Math.min(pct,100)+'%';
+  fill.className = 'capacity-fill' + (activeHours>capacity ? ' over' : '');
+  document.getElementById('capacityLabel').textContent = `${activeHours} / ${capacity} hrs/wk (${Math.round(pct)}%)`;
+
+  document.getElementById('taskRows').innerHTML = tasks.map((t,i)=>`
+    <div class="task-row ${t.done?'done':''}">
+      <input type="checkbox" ${t.done?'checked':''} data-taskdone="${i}">
+      <div class="task-name">${t.name}</div>
+      <div class="task-hours">${t.hours} hrs/wk</div>
+      <div class="rank-btns">
+        <button data-rankup="${i}" ${i===0?'disabled':''}>↑</button>
+        <button data-rankdown="${i}" ${i===tasks.length-1?'disabled':''}>↓</button>
+      </div>
+      <button class="btn secondary" data-taskrm="${i}" style="padding:4px 9px;font-size:10.5px;">Remove</button>
+    </div>
+  `).join('') || `<p style="color:var(--ink-soft);font-size:12.5px;">No tasks yet — add what's actually on your plate below.</p>`;
+
+  document.querySelectorAll('[data-taskdone]').forEach(cb=>{
+    cb.addEventListener('change', async ()=>{
+      const tasks = await loadData('workload-tasks', []);
+      tasks[Number(cb.dataset.taskdone)].done = cb.checked;
+      await saveData('workload-tasks', tasks);
+      renderTasks();
+    });
+  });
+  document.querySelectorAll('[data-taskrm]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const tasks = await loadData('workload-tasks', []);
+      tasks.splice(Number(b.dataset.taskrm),1);
+      await saveData('workload-tasks', tasks);
+      renderTasks();
+    });
+  });
+  document.querySelectorAll('[data-rankup]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const tasks = await loadData('workload-tasks', []);
+      const i = Number(b.dataset.rankup);
+      if(i>0){ [tasks[i-1],tasks[i]] = [tasks[i],tasks[i-1]]; await saveData('workload-tasks', tasks); renderTasks(); }
+    });
+  });
+  document.querySelectorAll('[data-rankdown]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const tasks = await loadData('workload-tasks', []);
+      const i = Number(b.dataset.rankdown);
+      if(i<tasks.length-1){ [tasks[i+1],tasks[i]] = [tasks[i],tasks[i+1]]; await saveData('workload-tasks', tasks); renderTasks(); }
+    });
+  });
+}
+document.getElementById('taskAdd').addEventListener('click', async ()=>{
+  const name = document.getElementById('taskName').value.trim();
+  const hours = Number(document.getElementById('taskHours').value) || 0;
+  if(!name) return;
+  const tasks = await loadData('workload-tasks', []);
+  tasks.push({name, hours, done:false});
+  await saveData('workload-tasks', tasks);
+  document.getElementById('taskName').value=''; document.getElementById('taskHours').value='';
+  renderTasks();
+});
+document.getElementById('capacitySetting').addEventListener('change', async ()=>{
+  await saveData('workload-capacity', Number(document.getElementById('capacitySetting').value)||10);
+  renderTasks();
+});
+
+/* ======================= PLANNER TAB ======================= */
+
+const MILESTONES = [
+  ["2026-08-01","IMT1 starts"],["2026-10-01","Scoping review protocol window"],
+  ["2026-10-01","ACF application window opens"],["2027-01-31","ACF application window closes"],
+  ["2027-02-01","MRCP Part 2 Written window"],["2027-08-01","IMT2 starts"],
+  ["2027-09-01","PACES window"],["2028-08-01","IMT3 starts"],
+  ["2029-10-01","ST4 national application window"],["2030-08-01","ST4 entry (cardiology)"],
+  ["2031-08-01","Five-Year Reset 1"],["2036-08-01","Five-Year Reset 2"],
+  ["2039-08-01","CCT / Consultant"],
+];
+
+let calViewDate = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+let selectedDay = null;
+
+function ymd(d){ return d.toISOString().slice(0,10); }
+
+function renderCountdown(){
+  const upcoming = MILESTONES.map(([d,l])=>({d:new Date(d),l})).filter(m=>m.d>=TODAY).sort((a,b)=>a.d-b.d)[0];
+  if(!upcoming){ document.getElementById('countdownBox').innerHTML = ''; return; }
+  const days = Math.round((upcoming.d-TODAY)/86400000);
+  document.getElementById('countdownBox').innerHTML = `<div class="cd-num">${days}</div><div class="cd-label">days to ${upcoming.l}</div>`;
+}
+
+async function renderCalendar(){
+  const y = calViewDate.getFullYear(), m = calViewDate.getMonth();
+  document.getElementById('calTitle').textContent = calViewDate.toLocaleString('en-GB',{month:'long', year:'numeric'});
+  const dows = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  document.getElementById('calDow').innerHTML = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  const firstDay = new Date(y,m,1);
+  const startOffset = (firstDay.getDay()+6)%7; // Monday-first
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const notes = await loadData('day-notes', {});
+
+  let cells = '';
+  for(let i=0;i<startOffset;i++) cells += `<div class="cal-day empty"></div>`;
+  for(let day=1; day<=daysInMonth; day++){
+    const dateStr = ymd(new Date(y,m,day));
+    const isToday = dateStr === ymd(TODAY);
+    const milestone = MILESTONES.find(([d])=>d===dateStr);
+    const hasNote = !!notes[dateStr];
+    cells += `<div class="cal-day ${isToday?'today':''} ${milestone?'milestone':''} ${hasNote?'has-note':''}" data-date="${dateStr}">
+      <span class="cal-num">${day}</span>
+      ${milestone?`<span class="cal-tag">${milestone[1]}</span>`:''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = cells;
+
+  document.querySelectorAll('.cal-day[data-date]').forEach(el=>{
+    el.addEventListener('click', ()=>selectDay(el.dataset.date));
+  });
+}
+
+async function selectDay(dateStr){
+  selectedDay = dateStr;
+  const card = document.getElementById('dayNoteCard');
+  card.style.display = 'block';
+  document.getElementById('dayNoteLabel').textContent = dateStr;
+  const notes = await loadData('day-notes', {});
+  document.getElementById('dayNoteText').value = notes[dateStr] || '';
+}
+document.getElementById('dayNoteText').addEventListener('blur', async ()=>{
+  if(!selectedDay) return;
+  const notes = await loadData('day-notes', {});
+  notes[selectedDay] = document.getElementById('dayNoteText').value;
+  await saveData('day-notes', notes);
+  renderCalendar();
+});
+document.getElementById('calPrev').addEventListener('click', ()=>{
+  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth()-1, 1);
+  renderCalendar();
+});
+document.getElementById('calNext').addEventListener('click', ()=>{
+  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth()+1, 1);
+  renderCalendar();
+});
+
+/* ======================= WALL DISPLAY MODE ======================= */
+document.getElementById('wallModeBtn').addEventListener('click', ()=>{
+  document.body.classList.add('wall-mode');
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-tab="progress"]').classList.add('active');
+  document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-progress').classList.add('active');
+  const el = document.documentElement;
+  if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+});
+document.getElementById('exitWallBtn').addEventListener('click', ()=>{
+  document.body.classList.remove('wall-mode');
+  if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+});
+
+/* ======================= INIT ======================= */
+(async function init(){
+  renderTopStats();
+  renderGoals();
+  renderCapMatrix();
+  renderProjects();
+  renderPHST();
+  await renderNinetyDay();
+  renderScoreDims();
+  await renderOppLog();
+  await renderReviewForm();
+  await renderNotNow();
+  renderTimeline('tlNear','tlNearLegend', TL_NEAR, TL_NEAR_MILESTONE, TL_NEAR_RANGE);
+  renderTimeline('tlNearWall','tlNearWallLegend', TL_NEAR, TL_NEAR_MILESTONE, TL_NEAR_RANGE);
+  renderTimeline('tlStrategic','tlStrategicLegend', TL_STRAT, TL_STRAT_MILESTONE, TL_STRAT_RANGE);
+  renderBoard();
+  await renderCadence();
+  await renderContacts();
+  await renderPipeline();
+  await renderJournal();
+  await renderEnergy();
+  await renderFOA();
+  renderTimeBudget();
+  await renderProgressGroups();
+  await renderTasks();
+  renderCountdown();
+  await renderCalendar();
+})();
+</script>
+</body>
+</html>
