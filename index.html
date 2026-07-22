@@ -1114,13 +1114,35 @@ async function renderTodayCapacity(){
 }
 
 /* ======================= TABS ======================= */
-document.getElementById('tabNav').addEventListener('click', e=>{
-  const btn = e.target.closest('button'); if(!btn) return;
+function activateTab(btn){
+  if(!btn) return;
   document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+}
+document.getElementById('tabNav').addEventListener('click', e=>{
+  activateTab(e.target.closest('button'));
 });
+(function(){
+  const nav = document.getElementById('tabNav');
+  let touchStartX = 0, touchStartY = 0, touchTarget = null;
+  nav.addEventListener('touchstart', e=>{
+    const t = e.touches[0];
+    touchStartX = t.clientX; touchStartY = t.clientY;
+    touchTarget = e.target.closest('button');
+  }, {passive:true});
+  nav.addEventListener('touchend', e=>{
+    if(!touchTarget) return;
+    const t = e.changedTouches[0];
+    const movedX = Math.abs(t.clientX - touchStartX), movedY = Math.abs(t.clientY - touchStartY);
+    if(movedX < 10 && movedY < 10){
+      e.preventDefault(); // it was a genuine tap, not a scroll — activate now and suppress the trailing synthetic click
+      activateTab(touchTarget);
+    }
+    touchTarget = null;
+  }, {passive:false});
+})();
 
 /* ======================= TOP STATS ======================= */
 function daysBetween(a,b){ return Math.round((b-a)/86400000); }
