@@ -302,7 +302,7 @@
   #wallModeBtn:hover{background:#233450;}
   body.wall-mode header.top .top-stats{display:none;}
   body.wall-mode nav.tabs button{display:none;}
-  body.wall-mode nav.tabs button[data-tab="progress"], body.wall-mode nav.tabs button[data-tab="home"]{display:inline-block;}
+  body.wall-mode nav.tabs button[data-tab="progress"], body.wall-mode nav.tabs button[data-tab="home"], body.wall-mode nav.tabs button[data-tab="ideas"]{display:inline-block;}
   body.wall-mode main{max-width:100%;padding:36px 48px;}
   body.wall-mode .section-title{font-size:34px;}
   body.wall-mode .section-sub{font-size:16px;}
@@ -340,6 +340,28 @@
   body.wall-mode .week-day textarea{font-size:16px;min-height:130px;}
   body.wall-mode .house-item{font-size:19px;padding:12px 0;}
   body.wall-mode .house-item input[type=checkbox]{width:24px;height:24px;}
+
+  /* ---------- Idea board ---------- */
+  .idea-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .idea-filter-chip{font-family:var(--mono);font-size:11.5px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--line);
+    background:#fff;color:var(--ink-soft);cursor:pointer;white-space:nowrap;}
+  .idea-filter-chip.active{border-color:currentColor;font-weight:700;}
+  .idea-board{display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:14px;}
+  .idea-card{border-radius:10px;padding:16px 18px;border-left:5px solid var(--ink);background:#fff;border-top:1px solid var(--line);
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;}
+  .idea-card .idea-text{font-size:14.5px;color:var(--ink);line-height:1.45;padding-right:26px;}
+  .idea-card .idea-meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+  .idea-card .idea-cat{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+  .idea-card .idea-date{font-family:var(--mono);font-size:10px;color:var(--ink-soft);}
+  .idea-card .idea-rm{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--ink-soft);
+    font-size:16px;cursor:pointer;padding:6px 10px;min-width:36px;min-height:36px;}
+  .idea-card .idea-rm:active{color:var(--rose);}
+  .idea-empty{color:var(--ink-soft);font-size:13px;grid-column:1/-1;}
+  body.wall-mode .idea-board{grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:18px;}
+  body.wall-mode .idea-card{padding:20px 22px;}
+  body.wall-mode .idea-card .idea-text{font-size:19px;}
+  body.wall-mode .idea-card .idea-cat, body.wall-mode .idea-card .idea-date{font-size:12px;}
+  body.wall-mode .idea-filter-chip{font-size:14px;padding:10px 18px;}
   body.wall-mode nav.tabs{padding:8px 48px;}
   #exitWallBtn{display:none;position:fixed;top:14px;right:14px;z-index:999;background:var(--navy-deep);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;opacity:.55;}
   body.wall-mode #exitWallBtn{display:block;}
@@ -401,6 +423,7 @@
   <button data-tab="overview">Strategy</button>
   <button data-tab="progress">Progress</button>
   <button data-tab="home">Home</button>
+  <button data-tab="ideas">Ideas</button>
   <button data-tab="planner">Planner</button>
   <button data-tab="longterm">Long-Term Strategy</button>
   <button data-tab="shortterm">Short-Term (Now)</button>
@@ -589,6 +612,24 @@
         <button class="btn secondary" id="houseItemAdd" style="padding:8px 14px;">Add</button>
       </div>
     </div>
+  </section>
+
+  <!-- ================= IDEAS ================= -->
+  <section class="panel" id="panel-ideas">
+    <h2 class="section-title">Ideas</h2>
+    <p class="section-sub">Capture it before it's gone. Tag it to a goal so it doesn't just float — everything here is meant to eventually feed the Research Pipeline (Systems tab) or a real task.</p>
+
+    <div class="card" style="margin-bottom:20px;">
+      <span class="eyebrow">Add an idea</span>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <input type="text" id="ideaText" placeholder='e.g. "Systematic review using AI niche searcher, with Ryan"' style="flex:2;min-width:220px;">
+        <select id="ideaCategory" style="flex:1;min-width:160px;"></select>
+        <button class="btn secondary" id="ideaAdd" style="padding:8px 14px;">Add</button>
+      </div>
+    </div>
+
+    <div class="idea-filters" id="ideaFilters"></div>
+    <div class="idea-board" id="ideaBoard"></div>
   </section>
 
   <!-- ================= PLANNER ================= -->
@@ -1643,6 +1684,86 @@ async function renderHouseItems(){
     });
   });
 }
+
+/* ======================= IDEAS BOARD ======================= */
+const IDEA_CATEGORIES = [
+  {key:"thesis", label:"Research / Thesis", color:"#2F9E64"},
+  {key:"clinical", label:"Clinical / Procedural", color:"#17263D"},
+  {key:"ai", label:"AI / Innovation", color:"#1E88A8"},
+  {key:"teaching", label:"Teaching", color:"#B8862E"},
+  {key:"leadership", label:"Leadership", color:"#6B4FA0"},
+  {key:"other", label:"Other", color:"#5B6472"},
+];
+let ideaFilter = "all";
+
+(function populateIdeaCategorySelect(){
+  const sel = document.getElementById('ideaCategory');
+  IDEA_CATEGORIES.forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c.key; opt.textContent = c.label;
+    sel.appendChild(opt);
+  });
+})();
+
+function catInfo(key){ return IDEA_CATEGORIES.find(c=>c.key===key) || IDEA_CATEGORIES[IDEA_CATEGORIES.length-1]; }
+
+async function renderIdeaFilters(){
+  const ideas = await loadData('idea-board', []);
+  const counts = {};
+  ideas.forEach(i=>{ counts[i.category] = (counts[i.category]||0)+1; });
+  const chips = [{key:"all", label:"All", color:"#17263D"}, ...IDEA_CATEGORIES];
+  document.getElementById('ideaFilters').innerHTML = chips.map(c=>{
+    const n = c.key==='all' ? ideas.length : (counts[c.key]||0);
+    return `<button class="idea-filter-chip ${ideaFilter===c.key?'active':''}" style="color:${c.color};" data-ideafilter="${c.key}">${esc(c.label)} (${n})</button>`;
+  }).join('');
+  document.querySelectorAll('[data-ideafilter]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      ideaFilter = btn.dataset.ideafilter;
+      renderIdeaFilters();
+      renderIdeaBoard();
+    });
+  });
+}
+
+async function renderIdeaBoard(){
+  const ideas = await loadData('idea-board', []);
+  const filtered = ideaFilter==='all' ? ideas : ideas.filter(i=>i.category===ideaFilter);
+  document.getElementById('ideaBoard').innerHTML = filtered.map((idea)=>{
+    const idx = ideas.indexOf(idea);
+    const c = catInfo(idea.category);
+    return `<div class="idea-card" style="border-left-color:${c.color};">
+      <button class="idea-rm" data-idearm="${idx}" title="Remove">✕</button>
+      <div class="idea-text">${esc(idea.text)}</div>
+      <div class="idea-meta">
+        <span class="idea-cat" style="color:${c.color};">${esc(c.label)}</span>
+        <span class="idea-date">${idea.date}</span>
+      </div>
+    </div>`;
+  }).join('') || `<p class="idea-empty">Nothing here yet${ideaFilter!=='all' ? ' in this category' : ''} — add your first idea above.</p>`;
+  document.querySelectorAll('[data-idearm]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const ideas = await loadData('idea-board', []);
+      ideas.splice(Number(b.dataset.idearm),1);
+      await saveData('idea-board', ideas);
+      renderIdeaFilters();
+      renderIdeaBoard();
+    });
+  });
+}
+document.getElementById('ideaAdd').addEventListener('click', async ()=>{
+  const text = document.getElementById('ideaText').value.trim();
+  if(!text) return;
+  const category = document.getElementById('ideaCategory').value;
+  const ideas = await loadData('idea-board', []);
+  ideas.unshift({text, category, date: ymd(TODAY)});
+  await saveData('idea-board', ideas);
+  document.getElementById('ideaText').value = '';
+  renderIdeaFilters();
+  renderIdeaBoard();
+});
+document.getElementById('ideaText').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') document.getElementById('ideaAdd').click();
+});
 document.getElementById('houseItemAdd').addEventListener('click', async ()=>{
   const val = document.getElementById('houseItemInput').value.trim();
   if(!val) return;
@@ -2114,6 +2235,8 @@ document.getElementById('exitWallBtn').addEventListener('click', ()=>{
   await renderHabit();
   await renderWeekPlanner();
   await renderHouseItems();
+  await renderIdeaFilters();
+  await renderIdeaBoard();
 })();
 </script>
 </body>
